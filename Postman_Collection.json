@@ -1,0 +1,565 @@
+{
+  "info": {
+    "_postman_id": "8c459f20-b4ef-479c-b17b-23f2fcf2bf90",
+    "name": "AI Personal Productivity & Finance Assistant - Milestone 1",
+    "description": "Postman Collection for Milestone 1 REST API testing, including User Profile Management, Finance Tracker, Study Sessions, Habits Tracker, and Activity logs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"Password123!\",\n  \"phoneNumber\": \"+1-555-0100\",\n  \"dateOfBirth\": \"1998-04-12\",\n  \"occupation\": \"Research Analyst\",\n  \"educationLevel\": \"Master of Science\",\n  \"monthlyIncome\": 4800.00,\n  \"monthlyExpenseTarget\": 2200.00,\n  \"studyGoal\": \"Obtain AWS Solutions Architect Certification\",\n  \"dailyStudyHoursTarget\": 2.0,\n  \"habitGoals\": \"Workout 3x/week, Read daily\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.environment.set(\"jwt_token\", response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.carter@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Alex J. Carter\",\n  \"occupation\": \"Senior Software Engineer\",\n  \"monthlyIncome\": 7200.00,\n  \"monthlyExpenseTarget\": 2800.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": ["{{base_url}}"],
+              "path": ["profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Finance Tracker",
+      "item": [
+        {
+          "name": "Get Transactions History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            }
+          }
+        },
+        {
+          "name": "Add Transaction",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Gym Membership\",\n  \"category\": \"Health & Fitness\",\n  \"type\": \"EXPENSE\",\n  \"amount\": 80.00,\n  \"paymentMethod\": \"Credit Card\",\n  \"notes\": \"Monthly health club fee\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            }
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Gym Membership Gold\",\n  \"category\": \"Health & Fitness\",\n  \"type\": \"EXPENSE\",\n  \"amount\": 95.00,\n  \"paymentMethod\": \"Credit Card\",\n  \"notes\": \"Upgraded membership package\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions/YOUR_TX_ID",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "YOUR_TX_ID"]
+            }
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactions/YOUR_TX_ID",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "YOUR_TX_ID"]
+            }
+          }
+        },
+        {
+          "name": "Get Monthly Summary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactions/summary?year=2026&month=7",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "summary"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                },
+                {
+                  "key": "month",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Study Tracker",
+      "item": [
+        {
+          "name": "Get Study Sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/study",
+              "host": ["{{base_url}}"],
+              "path": ["study"]
+            }
+          }
+        },
+        {
+          "name": "Add Study Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Computer Science\",\n  \"topic\": \"Graph Theory & BFS\",\n  \"duration\": 90,\n  \"productivityRating\": 4,\n  \"notes\": \"Solved LeetCode graph traversal problems\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/study",
+              "host": ["{{base_url}}"],
+              "path": ["study"]
+            }
+          }
+        },
+        {
+          "name": "Update Study Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Computer Science\",\n  \"topic\": \"Graph Theory & BFS/DFS\",\n  \"duration\": 120,\n  \"productivityRating\": 5,\n  \"notes\": \"Completed all medium graph problems\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/study/YOUR_SESSION_ID",
+              "host": ["{{base_url}}"],
+              "path": ["study", "YOUR_SESSION_ID"]
+            }
+          }
+        },
+        {
+          "name": "Delete Study Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/study/YOUR_SESSION_ID",
+              "host": ["{{base_url}}"],
+              "path": ["study", "YOUR_SESSION_ID"]
+            }
+          }
+        },
+        {
+          "name": "Get Study Hours Aggregates",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/study/total-hours",
+              "host": ["{{base_url}}"],
+              "path": ["study", "total-hours"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Habits Tracker",
+      "item": [
+        {
+          "name": "Get Habits",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/habits",
+              "host": ["{{base_url}}"],
+              "path": ["habits"]
+            }
+          }
+        },
+        {
+          "name": "Add Habit",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Read Tech Blogs\",\n  \"targetFrequency\": \"Daily\",\n  \"completed\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/habits",
+              "host": ["{{base_url}}"],
+              "path": ["habits"]
+            }
+          }
+        },
+        {
+          "name": "Update Habit (Mark Complete)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Read Tech Blogs\",\n  \"targetFrequency\": \"Daily\",\n  \"completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/habits/YOUR_HABIT_ID",
+              "host": ["{{base_url}}"],
+              "path": ["habits", "YOUR_HABIT_ID"]
+            }
+          }
+        },
+        {
+          "name": "Delete Habit",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/habits/YOUR_HABIT_ID",
+              "host": ["{{base_url}}"],
+              "path": ["habits", "YOUR_HABIT_ID"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activity Audit",
+      "item": [
+        {
+          "name": "Get Activity Logs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/activity",
+              "host": ["{{base_url}}"],
+              "path": ["activity"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
