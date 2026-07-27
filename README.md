@@ -1,6 +1,6 @@
 # AI-powered Personal Productivity & Finance Assistant - Milestone 1
 
-Welcome to Milestone 1 of the Personal Productivity & Finance Assistant. This project features a secure Express.js API backend and an interactive, glassmorphic React + TypeScript frontend dashboard.
+
 
 ---
 
