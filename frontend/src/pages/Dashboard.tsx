@@ -162,7 +162,7 @@ export const Dashboard: React.FC = () => {
               ${finance?.totalExpense.toFixed(2) || '0.00'}
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '12px' }}>
-              Target: <span style={{ color: 'white', fontWeight: 600 }}>${finance?.monthlyExpenseTarget.toFixed(2) || '0.00'}</span>
+              Target: <span style={{ color: 'var(--text-highlight)', fontWeight: 600 }}>${finance?.monthlyExpenseTarget.toFixed(2) || '0.00'}</span>
             </p>
           </div>
 
@@ -176,7 +176,7 @@ export const Dashboard: React.FC = () => {
               {study?.totalHours.toFixed(1) || '0.0'} hrs
             </h3>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '12px' }}>
-              Target: <span style={{ color: 'white', fontWeight: 600 }}>{user?.dailyStudyHoursTarget || 0} hrs/day</span>
+              Target: <span style={{ color: 'var(--text-highlight)', fontWeight: 600 }}>{user?.dailyStudyHoursTarget || 0} hrs/day</span>
             </p>
           </div>
 
@@ -212,10 +212,10 @@ export const Dashboard: React.FC = () => {
                 <h5 style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Long-Term Study Goal</h5>
                 <div style={{
                   padding: '16px',
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(0,0,0,0.02)',
+                  border: '1px solid var(--card-border)',
                   borderRadius: '10px',
-                  color: 'white',
+                  color: 'var(--text-highlight)',
                   fontWeight: 500
                 }}>
                   {user?.studyGoal || 'No study goal defined. Head to Profile to set one.'}
@@ -226,10 +226,10 @@ export const Dashboard: React.FC = () => {
                 <h5 style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Habit Targets Summary</h5>
                 <div style={{
                   padding: '16px',
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(0,0,0,0.02)',
+                  border: '1px solid var(--card-border)',
                   borderRadius: '10px',
-                  color: 'white',
+                  color: 'var(--text-highlight)',
                   fontWeight: 500
                 }}>
                   {user?.habitGoals || 'No habits summary set yet.'}
@@ -268,7 +268,7 @@ export const Dashboard: React.FC = () => {
                 activities.map((act) => (
                   <div key={act.id} style={{
                     padding: '12px 16px',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderBottom: '1px solid var(--card-border)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '4px'
@@ -279,8 +279,8 @@ export const Dashboard: React.FC = () => {
                         fontWeight: 700,
                         color: act.activityType.includes('Completed') || act.activityType.includes('Registered')
                           ? 'var(--success)'
-                          : act.activityType.includes('Login') ? 'var(--primary)' : 'white',
-                        background: 'rgba(255,255,255,0.03)',
+                          : act.activityType.includes('Login') ? 'var(--primary)' : 'var(--text-highlight)',
+                        background: 'rgba(0,0,0,0.03)',
                         padding: '2px 8px',
                         borderRadius: '4px'
                       }}>

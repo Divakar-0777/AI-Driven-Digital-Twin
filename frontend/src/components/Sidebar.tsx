@@ -30,9 +30,9 @@ export const Sidebar: React.FC = () => {
       position: 'fixed',
       left: 0,
       top: 0,
-      background: 'rgba(17, 24, 39, 0.85)',
+      background: 'rgba(255, 255, 255, 0.85)',
       backdropFilter: 'blur(20px)',
-      borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+      borderRight: '1px solid rgba(0, 0, 0, 0.08)',
       display: 'flex',
       flexDirection: 'column',
       padding: '24px',
@@ -72,8 +72,8 @@ export const Sidebar: React.FC = () => {
           gap: '12px',
           padding: '12px',
           borderRadius: '12px',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.05)',
+          background: 'rgba(0,0,0,0.03)',
+          border: '1px solid rgba(0,0,0,0.05)',
           marginBottom: '28px'
         }}>
           <img
@@ -115,8 +115,8 @@ export const Sidebar: React.FC = () => {
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                  e.currentTarget.style.color = 'var(--text-highlight)';
                 }
               }}
               onMouseLeave={(e) => {

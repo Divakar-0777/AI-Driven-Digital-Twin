@@ -5,32 +5,32 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark light;
-  color: #f3f4f6;
-  background-color: #0b0f19;
+  color-scheme: light;
+  color: #1e293b;
+  background-color: #f8fafc;
 
-  /* Color Palette - Cyberpunk Minimalist / Deep Ocean */
-  --bg-gradient-start: #0b0f19;
-  --bg-gradient-end: #111827;
+  /* Premium Soft Light / Slate Theme */
+  --bg-gradient-start: #f8fafc;
+  --bg-gradient-end: #f1f5f9;
   
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.35);
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.12);
   
   --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.25);
+  --success-glow: rgba(16, 185, 129, 0.12);
   
   --danger: #ef4444;
-  --danger-glow: rgba(239, 68, 68, 0.25);
+  --danger-glow: rgba(239, 68, 68, 0.12);
   
-  --warning: #f59e0b;
+  --warning: #d97706;
   
-  --card-bg: rgba(17, 24, 39, 0.7);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --input-bg: rgba(31, 41, 55, 0.6);
-  --input-border: rgba(255, 255, 255, 0.1);
-  --text-muted: #9ca3af;
-  --text-highlight: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-border: rgba(79, 70, 229, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-border: rgba(0, 0, 0, 0.08);
+  --text-muted: #64748b;
+  --text-highlight: #0f172a;
 }
 
 * {
@@ -55,11 +55,11 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--card-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(79, 70, 229, 0.04);
 }
 
 .glass-card {
-  background: rgba(31, 41, 55, 0.45);
+  background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(8px);
   border: 1px solid var(--card-border);
   border-radius: 12px;
@@ -115,12 +115,12 @@ button:disabled {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text-highlight);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .btn-danger {
@@ -152,7 +152,7 @@ input, select, textarea {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  color: white;
+  color: var(--text-highlight);
   outline: none;
   transition: all 0.2s;
 }
