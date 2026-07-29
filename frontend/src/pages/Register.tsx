@@ -12,6 +12,7 @@ export const Register: React.FC = () => {
     email: '',
     password: '',
     phoneNumber: '',
+    profilePhotoUrl: '',
     dateOfBirth: '',
     occupation: '',
     educationLevel: '',
@@ -65,6 +66,7 @@ export const Register: React.FC = () => {
       if (!payload.educationLevel) delete payload.educationLevel;
       if (!payload.studyGoal) delete payload.studyGoal;
       if (!payload.habitGoals) delete payload.habitGoals;
+      if (!payload.profilePhotoUrl) delete payload.profilePhotoUrl;
 
       await registerUser(payload);
       navigate('/');
@@ -130,7 +132,7 @@ export const Register: React.FC = () => {
                   id="register-fullname"
                   name="fullName"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Enter Your Name"
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
@@ -178,8 +180,22 @@ export const Register: React.FC = () => {
                   id="register-phone"
                   name="phoneNumber"
                   type="text"
-                  placeholder="+1 (555) 123-4567"
+                  placeholder="Enter Your PhoneNumber"
                   value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-muted)' }}>
+                  Profile Photo URL
+                </label>
+                <input
+                  id="register-photourl"
+                  name="profilePhotoUrl"
+                  type="text"
+                  placeholder="https://example.com/photo.jpg"
+                  value={formData.profilePhotoUrl}
                   onChange={handleInputChange}
                 />
               </div>
@@ -217,7 +233,7 @@ export const Register: React.FC = () => {
                     id="register-occupation"
                     name="occupation"
                     type="text"
-                    placeholder="Engineer"
+                    placeholder="Enter Your Occupation"
                     value={formData.occupation}
                     onChange={handleInputChange}
                   />
@@ -294,7 +310,7 @@ export const Register: React.FC = () => {
                   id="register-study-goal"
                   name="studyGoal"
                   type="text"
-                  placeholder="Master AI & Algorithms"
+                  placeholder="Enter Your Goal"
                   value={formData.studyGoal}
                   onChange={handleInputChange}
                 />

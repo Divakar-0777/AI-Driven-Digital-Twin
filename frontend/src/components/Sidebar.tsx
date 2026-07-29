@@ -76,11 +76,30 @@ export const Sidebar: React.FC = () => {
           border: '1px solid rgba(0,0,0,0.05)',
           marginBottom: '28px'
         }}>
-          <img
-            src={user.profilePhotoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
-            alt="Profile"
-            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }}
-          />
+          {user.profilePhotoUrl ? (
+            <img
+              src={user.profilePhotoUrl}
+              alt="Profile"
+              style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)', flexShrink: 0 }}
+            />
+          ) : (
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: 'var(--primary-glow)',
+              border: '2px solid var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary)',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              flexShrink: 0
+            }}>
+              {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '?'}
+            </div>
+          )}
           <div style={{ overflow: 'hidden' }}>
             <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-highlight)', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
               {user.fullName}

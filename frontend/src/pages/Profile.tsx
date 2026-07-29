@@ -331,11 +331,30 @@ export const Profile: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {/* Bio Card */}
             <div className="glass-panel" style={{ padding: '32px', textAlign: 'center' }}>
-              <img
-                src={formData.profilePhotoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'}
-                alt="Profile photo preview"
-                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto 16px' }}
-              />
+              {formData.profilePhotoUrl ? (
+                <img
+                  src={formData.profilePhotoUrl}
+                  alt="Profile photo preview"
+                  style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto 16px', display: 'block' }}
+                />
+              ) : (
+                <div style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  background: 'var(--primary-glow)',
+                  border: '3px solid var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--primary)',
+                  fontWeight: 700,
+                  fontSize: '2.5rem',
+                  margin: '0 auto 16px'
+                }}>
+                  {formData.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '?'}
+                </div>
+              )}
               <h3 style={{ fontSize: '1.25rem', color: 'var(--text-highlight)', fontWeight: 700 }}>{formData.fullName}</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '4px' }}>{formData.occupation || 'Personal Account'}</p>
               
