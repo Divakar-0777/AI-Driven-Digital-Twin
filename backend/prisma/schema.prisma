@@ -9,28 +9,43 @@ generator client {
 
 model User {
   id                   String                 @id @default(uuid())
-  fullName             String
   email                String                 @unique
   password             String
-  phoneNumber          String?
-  dateOfBirth          DateTime?
-  occupation           String?
-  educationLevel       String?
-  monthlyIncome        Decimal                @default(0.00)
-  monthlyExpenseTarget Decimal                @default(0.00)
-  studyGoal            String?
-  dailyStudyHoursTarget Float                 @default(0.0)
-  habitGoals           String?
-  profilePhotoUrl      String?
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
 
+  profile              Profile?
   transactions         FinancialTransaction[]
   studySessions        StudySession[]
   habits               Habit[]
   activityHistory      ActivityHistory[]
+  digitalTwinState     DigitalTwinState?
+  aiRecommendations    AiRecommendation[]
+  notifications        Notification[]
 
   @@map("Users")
+}
+
+model Profile {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  fullName             String
+  phoneNumber          String?
+  dateOfBirth          DateTime?
+  occupation           String?
+  educationLevel       String?
+  monthlyIncome        Decimal  @default(0.00)
+  monthlyExpenseTarget Decimal  @default(0.00)
+  studyGoal            String?
+  dailyStudyHoursTarget Float   @default(0.0)
+  habitGoals           String?
+  profilePhotoUrl      String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Profiles")
 }
 
 model FinancialTransaction {
@@ -46,6 +61,8 @@ model FinancialTransaction {
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([date])
   @@map("FinancialTransactions")
 }
 
@@ -61,6 +78,7 @@ model StudySession {
 
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("StudySessions")
 }
 
@@ -74,7 +92,38 @@ model Habit {
 
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("Habits")
+}
+
+model DigitalTwinState {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  productivityScore    Float    @default(0.0)
+  financialHealthScore Float    @default(0.0)
+  twinEmoticon         String   @default("😐")
+  twinStatus           String   @default("Initializing")
+  syncTimestamp        DateTime @default(now())
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("DigitalTwinStates")
+}
+
+model AiRecommendation {
+  id                 String   @id @default(uuid())
+  userId             String
+  category           String   // 'FINANCE', 'STUDY', 'HABITS'
+  recommendationText String
+  impactLevel        String   // 'HIGH', 'MEDIUM', 'LOW'
+  isApplied          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("AiRecommendations")
 }
 
 model ActivityHistory {
@@ -86,5 +135,22 @@ model ActivityHistory {
 
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("ActivityHistory")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // 'INFO', 'ALERT', 'ACHIEVEMENT'
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("Notifications")
 }

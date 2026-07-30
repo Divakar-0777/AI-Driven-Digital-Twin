@@ -51,16 +51,16 @@ export const Sidebar: React.FC = () => {
           justifyContent: 'center',
           fontWeight: 800,
           color: 'white',
-          fontSize: '1.25rem',
+          fontSize: '1.05rem',
           boxShadow: '0 4px 12px var(--primary-glow)'
         }}>
-          Ω
+          DT
         </div>
         <div>
           <h1 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-highlight)', letterSpacing: '0.5px' }}>
-            Antigravity AI
+            AI Digital Twin
           </h1>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Assistant v1.0</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Twin v1.0</span>
         </div>
       </div>
 

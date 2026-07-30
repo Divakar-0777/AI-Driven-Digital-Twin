@@ -11,8 +11,52 @@ export const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>({});
+
+  const validate = (field: 'email' | 'password', val: string) => {
+    let err = '';
+    if (field === 'email') {
+      if (!val.trim()) {
+        err = 'Email address is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        err = 'Invalid email address format';
+      }
+    } else if (field === 'password') {
+      if (!val) {
+        err = 'Password is required';
+      }
+    }
+    setErrors(prev => ({ ...prev, [field]: err }));
+    return err;
+  };
+
+  const handleBlur = (field: 'email' | 'password', val: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    validate(field, val);
+  };
+
+  const handleChange = (field: 'email' | 'password', val: string) => {
+    if (field === 'email') setEmail(val);
+    if (field === 'password') setPassword(val);
+    
+    if (touched[field]) {
+      validate(field, val);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all fields
+    setTouched({ email: true, password: true });
+    const emailErr = validate('email', email);
+    const passwordErr = validate('password', password);
+
+    if (emailErr || passwordErr) {
+      return;
+    }
+
     setError(null);
     setLoading(true);
 
@@ -73,9 +117,14 @@ export const Login: React.FC = () => {
               type="email"
               placeholder="name@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => handleChange('email', e.target.value)}
+              onBlur={(e) => handleBlur('email', e.target.value)}
+              className={touched.email && errors.email ? 'invalid' : ''}
               required
             />
+            {touched.email && errors.email && (
+              <span className="input-error">{errors.email}</span>
+            )}
           </div>
 
           <div>
@@ -89,9 +138,14 @@ export const Login: React.FC = () => {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={(e) => handleBlur('password', e.target.value)}
+              className={touched.password && errors.password ? 'invalid' : ''}
               required
             />
+            {touched.password && errors.password && (
+              <span className="input-error">{errors.password}</span>
+            )}
           </div>
 
           <button

@@ -26,19 +26,100 @@ export const Register: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
+  const validateField = (name: string, value: any) => {
+    let err = '';
+    
+    if (name === 'fullName') {
+      if (!value.trim()) {
+        err = 'Full Name is required';
+      }
+    } else if (name === 'email') {
+      if (!value.trim()) {
+        err = 'Email address is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        err = 'Invalid email address format';
+      }
+    } else if (name === 'password') {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if (!value) {
+        err = 'Password is required';
+      } else if (!passwordRegex.test(value)) {
+        err = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+      }
+    } else if (name === 'profilePhotoUrl') {
+      if (value && !/^https?:\/\/.+/.test(value)) {
+        err = 'Invalid URL format for profile photo (must start with http:// or https://)';
+      }
+    } else if (name === 'dateOfBirth') {
+      if (value) {
+        const dob = new Date(value);
+        const today = new Date();
+        if (dob > today) {
+          err = 'Date of birth cannot be in the future';
+        }
+      }
+    } else if (name === 'monthlyIncome') {
+      const num = Number(value);
+      if (value !== '' && (isNaN(num) || num < 0)) {
+        err = 'Monthly income must be a positive number';
+      }
+    } else if (name === 'monthlyExpenseTarget') {
+      const num = Number(value);
+      if (value !== '' && (isNaN(num) || num < 0)) {
+        err = 'Monthly expense target must be a positive number';
+      }
+    } else if (name === 'dailyStudyHoursTarget') {
+      const num = Number(value);
+      if (value !== '' && (isNaN(num) || num < 0)) {
+        err = 'Daily study hours target must be a positive number';
+      }
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: err }));
+    return err;
+  };
+
+  const handleBlur = (name: string) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, formData[name as keyof typeof formData]);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    const typedValue = name === 'monthlyIncome' || name === 'monthlyExpenseTarget' || name === 'dailyStudyHoursTarget'
+      ? (value === '' ? 0 : Number(value))
+      : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'monthlyIncome' || name === 'monthlyExpenseTarget' || name === 'dailyStudyHoursTarget'
-        ? Number(value)
-        : value,
+      [name]: typedValue,
     }));
+
+    if (touched[name]) {
+      validateField(name, typedValue);
+    }
   };
 
   const handleNextStep = () => {
-    if (!formData.fullName || !formData.email || !formData.password) {
-      setError('Please fill in the required fields (Full Name, Email, and Password).');
+    const step1Fields = ['fullName', 'email', 'password', 'phoneNumber', 'profilePhotoUrl'];
+    const newTouched = { ...touched };
+    let hasError = false;
+
+    step1Fields.forEach((field) => {
+      newTouched[field] = true;
+      const err = validateField(field, formData[field as keyof typeof formData]);
+      if (err) {
+        hasError = true;
+      }
+    });
+
+    setTouched(newTouched);
+
+    if (hasError) {
+      setError('Please resolve all validation errors in Step 1 before continuing.');
       return;
     }
     setError(null);
@@ -53,6 +134,36 @@ export const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const allFields = [
+      'fullName', 'email', 'password', 'phoneNumber', 'profilePhotoUrl',
+      'dateOfBirth', 'occupation', 'educationLevel', 'monthlyIncome',
+      'monthlyExpenseTarget', 'studyGoal', 'dailyStudyHoursTarget', 'habitGoals'
+    ];
+
+    const newTouched = { ...touched };
+    let hasError = false;
+
+    allFields.forEach((field) => {
+      newTouched[field] = true;
+      const err = validateField(field, formData[field as keyof typeof formData]);
+      if (err) {
+        hasError = true;
+      }
+    });
+
+    setTouched(newTouched);
+
+    if (hasError) {
+      setError('Please resolve all validation errors before submitting.');
+      const step1Fields = ['fullName', 'email', 'password', 'phoneNumber', 'profilePhotoUrl'];
+      const hasStep1Error = step1Fields.some(field => validateField(field, formData[field as keyof typeof formData]));
+      if (hasStep1Error) {
+        setStep(1);
+      }
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -79,7 +190,7 @@ export const Register: React.FC = () => {
       } else {
         setError(err.response?.data?.error || 'Registration failed. Please review fields and try again.');
       }
-      setStep(1); // Return to first step to fix core fields
+      setStep(1);
     } finally {
       setLoading(false);
     }
@@ -135,8 +246,13 @@ export const Register: React.FC = () => {
                   placeholder="Enter Your Name"
                   value={formData.fullName}
                   onChange={handleInputChange}
+                  onBlur={() => handleBlur('fullName')}
+                  className={touched.fullName && errors.fullName ? 'invalid' : ''}
                   required
                 />
+                {touched.fullName && errors.fullName && (
+                  <span className="input-error">{errors.fullName}</span>
+                )}
               </div>
 
               <div>
@@ -150,8 +266,13 @@ export const Register: React.FC = () => {
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onBlur={() => handleBlur('email')}
+                  className={touched.email && errors.email ? 'invalid' : ''}
                   required
                 />
+                {touched.email && errors.email && (
+                  <span className="input-error">{errors.email}</span>
+                )}
               </div>
 
               <div>
@@ -165,11 +286,17 @@ export const Register: React.FC = () => {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
+                  onBlur={() => handleBlur('password')}
+                  className={touched.password && errors.password ? 'invalid' : ''}
                   required
                 />
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-                  Must be at least 8 chars, containing uppercase, lowercase, number, and special character.
-                </span>
+                {touched.password && errors.password ? (
+                  <span className="input-error">{errors.password}</span>
+                ) : (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                    Must be at least 8 chars, containing uppercase, lowercase, number, and special character.
+                  </span>
+                )}
               </div>
 
               <div>
@@ -183,7 +310,12 @@ export const Register: React.FC = () => {
                   placeholder="Enter Your PhoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
+                  onBlur={() => handleBlur('phoneNumber')}
+                  className={touched.phoneNumber && errors.phoneNumber ? 'invalid' : ''}
                 />
+                {touched.phoneNumber && errors.phoneNumber && (
+                  <span className="input-error">{errors.phoneNumber}</span>
+                )}
               </div>
 
               <div>
@@ -197,7 +329,12 @@ export const Register: React.FC = () => {
                   placeholder="https://example.com/photo.jpg"
                   value={formData.profilePhotoUrl}
                   onChange={handleInputChange}
+                  onBlur={() => handleBlur('profilePhotoUrl')}
+                  className={touched.profilePhotoUrl && errors.profilePhotoUrl ? 'invalid' : ''}
                 />
+                {touched.profilePhotoUrl && errors.profilePhotoUrl && (
+                  <span className="input-error">{errors.profilePhotoUrl}</span>
+                )}
               </div>
 
               <button
@@ -223,7 +360,12 @@ export const Register: React.FC = () => {
                     type="date"
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('dateOfBirth')}
+                    className={touched.dateOfBirth && errors.dateOfBirth ? 'invalid' : ''}
                   />
+                  {touched.dateOfBirth && errors.dateOfBirth && (
+                    <span className="input-error">{errors.dateOfBirth}</span>
+                  )}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-muted)' }}>
@@ -264,9 +406,14 @@ export const Register: React.FC = () => {
                     type="number"
                     min="0"
                     placeholder="5000"
-                    value={formData.monthlyIncome}
+                    value={formData.monthlyIncome || ''}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('monthlyIncome')}
+                    className={touched.monthlyIncome && errors.monthlyIncome ? 'invalid' : ''}
                   />
+                  {touched.monthlyIncome && errors.monthlyIncome && (
+                    <span className="input-error">{errors.monthlyIncome}</span>
+                  )}
                 </div>
               </div>
 
@@ -281,9 +428,14 @@ export const Register: React.FC = () => {
                     type="number"
                     min="0"
                     placeholder="2000"
-                    value={formData.monthlyExpenseTarget}
+                    value={formData.monthlyExpenseTarget || ''}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('monthlyExpenseTarget')}
+                    className={touched.monthlyExpenseTarget && errors.monthlyExpenseTarget ? 'invalid' : ''}
                   />
+                  {touched.monthlyExpenseTarget && errors.monthlyExpenseTarget && (
+                    <span className="input-error">{errors.monthlyExpenseTarget}</span>
+                  )}
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-muted)' }}>
@@ -296,9 +448,14 @@ export const Register: React.FC = () => {
                     step="0.5"
                     min="0"
                     placeholder="2"
-                    value={formData.dailyStudyHoursTarget}
+                    value={formData.dailyStudyHoursTarget || ''}
                     onChange={handleInputChange}
+                    onBlur={() => handleBlur('dailyStudyHoursTarget')}
+                    className={touched.dailyStudyHoursTarget && errors.dailyStudyHoursTarget ? 'invalid' : ''}
                   />
+                  {touched.dailyStudyHoursTarget && errors.dailyStudyHoursTarget && (
+                    <span className="input-error">{errors.dailyStudyHoursTarget}</span>
+                  )}
                 </div>
               </div>
 

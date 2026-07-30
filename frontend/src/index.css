@@ -166,6 +166,28 @@ input::placeholder, textarea::placeholder {
   color: var(--text-muted);
 }
 
+input.invalid, select.invalid, textarea.invalid {
+  border-color: var(--danger) !important;
+}
+
+input.invalid:focus, select.invalid:focus, textarea.invalid:focus {
+  box-shadow: 0 0 0 2px var(--danger-glow) !important;
+}
+
+.input-error {
+  color: #ef4444; /* matching var(--danger) or slightly brighter for text visibility */
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Grid & Layout layouts */
 .dashboard-grid {
   display: grid;

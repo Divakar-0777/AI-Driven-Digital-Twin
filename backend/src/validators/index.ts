@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Password strength pattern: at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 export const RegisterSchema = z.object({
   fullName: z.string().min(1, 'Full Name is required'),

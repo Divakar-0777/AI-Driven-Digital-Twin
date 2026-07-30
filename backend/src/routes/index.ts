@@ -22,6 +22,9 @@ import {
   deleteHabit,
 } from '../controllers/habitController';
 import { getActivityHistory } from '../controllers/activityController';
+import { getTwinState, syncTwinState } from '../controllers/digitalTwinController';
+import { getRecommendations, applyRecommendation } from '../controllers/recommendationController';
+import { getNotifications, readNotification, deleteNotification } from '../controllers/notificationController';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
@@ -57,6 +60,19 @@ router.delete('/habits/:id', authenticateToken as any, deleteHabit);
 
 // --- Activity (Protected) ---
 router.get('/activity', authenticateToken as any, getActivityHistory);
+
+// --- Digital Twin (Protected) ---
+router.get('/digital-twin', authenticateToken as any, getTwinState);
+router.post('/digital-twin/sync', authenticateToken as any, syncTwinState);
+
+// --- AI Recommendations (Protected) ---
+router.get('/recommendations', authenticateToken as any, getRecommendations);
+router.put('/recommendations/:id/apply', authenticateToken as any, applyRecommendation);
+
+// --- Notifications (Protected) ---
+router.get('/notifications', authenticateToken as any, getNotifications);
+router.put('/notifications/:id/read', authenticateToken as any, readNotification);
+router.delete('/notifications/:id', authenticateToken as any, deleteNotification);
 
 export default router;
 export { router as rootRouter };

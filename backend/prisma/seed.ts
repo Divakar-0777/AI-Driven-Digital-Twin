@@ -7,21 +7,31 @@ async function main() {
   console.log('Seeding database...');
 
   // Clear existing records in reverse dependency order
+  await prisma.notification.deleteMany();
+  await prisma.aiRecommendation.deleteMany();
+  await prisma.digitalTwinState.deleteMany();
   await prisma.activityHistory.deleteMany();
   await prisma.habit.deleteMany();
   await prisma.studySession.deleteMany();
   await prisma.financialTransaction.deleteMany();
+  await prisma.profile.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create a Demo User
+  // Create a Demo User (Alex Carter)
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash('Password123!', salt);
 
-  const demoUser = await prisma.user.create({
+  const alexUser = await prisma.user.create({
     data: {
-      fullName: 'Alex Carter',
       email: 'alex.carter@example.com',
       password: hashedPassword,
+    },
+  });
+
+  const alexProfile = await prisma.profile.create({
+    data: {
+      userId: alexUser.id,
+      fullName: 'Alex Carter',
       phoneNumber: '+1-555-0199',
       dateOfBirth: new Date('1995-06-15'),
       occupation: 'Software Engineer',
@@ -31,12 +41,31 @@ async function main() {
       studyGoal: 'Mastering Machine Learning & Neural Networks',
       dailyStudyHoursTarget: 2.5,
       habitGoals: 'Workout 4x/week, Read 15 mins daily, Meditate',
+      profilePhotoUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80',
     },
   });
 
-  console.log(`User created: ${demoUser.fullName} (${demoUser.email})`);
+  // Create an Admin User (Admin Admin)
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@example.com',
+      password: hashedPassword,
+    },
+  });
 
-  // Seed Financial Transactions
+  await prisma.profile.create({
+    data: {
+      userId: adminUser.id,
+      fullName: 'Admin User',
+      occupation: 'System Administrator',
+      monthlyIncome: 10000.00,
+      monthlyExpenseTarget: 4000.00,
+    },
+  });
+
+  console.log(`Users created: ${alexProfile.fullName} (alex.carter@example.com) & Admin (admin@example.com)`);
+
+  // Seed Financial Transactions for Alex
   const transactions = [
     {
       title: 'Monthly Salary Payment',
@@ -97,14 +126,14 @@ async function main() {
   for (const tx of transactions) {
     await prisma.financialTransaction.create({
       data: {
-        userId: demoUser.id,
+        userId: alexUser.id,
         ...tx,
       },
     });
   }
   console.log('Seeded financial transactions.');
 
-  // Seed Study Sessions
+  // Seed Study Sessions for Alex
   const studySessions = [
     {
       subject: 'Machine Learning',
@@ -135,14 +164,14 @@ async function main() {
   for (const session of studySessions) {
     await prisma.studySession.create({
       data: {
-        userId: demoUser.id,
+        userId: alexUser.id,
         ...session,
       },
     });
   }
   console.log('Seeded study sessions.');
 
-  // Seed Habits
+  // Seed Habits for Alex
   const habits = [
     {
       name: 'Drink 3L of Water',
@@ -173,14 +202,84 @@ async function main() {
   for (const habit of habits) {
     await prisma.habit.create({
       data: {
-        userId: demoUser.id,
+        userId: alexUser.id,
         ...habit,
       },
     });
   }
   console.log('Seeded habits.');
 
-  // Seed Activity History
+  // Seed Digital Twin State for Alex
+  await prisma.digitalTwinState.create({
+    data: {
+      userId: alexUser.id,
+      productivityScore: 78,
+      financialHealthScore: 82,
+      twinEmoticon: '🚀',
+      twinStatus: 'Digital Twin is Thriving! Highly productive, focused, and maintaining great savings.',
+    },
+  });
+  console.log('Seeded Digital Twin state.');
+
+  // Seed AI Recommendations for Alex
+  const recommendations = [
+    {
+      category: 'FINANCE',
+      recommendationText: 'Great job saving 65% of your income! Allocate surplus funds to high-yield savings to beat inflation.',
+      impactLevel: 'MEDIUM',
+      isApplied: false,
+    },
+    {
+      category: 'STUDY',
+      recommendationText: 'You are averaging lower than your daily study target (2.5 hrs). Try scheduling short, focused 45-minute blocks.',
+      impactLevel: 'HIGH',
+      isApplied: false,
+    },
+    {
+      category: 'HABITS',
+      recommendationText: 'Excellent habit completion consistency! Challenge yourself by adding one new target routine.',
+      impactLevel: 'LOW',
+      isApplied: false,
+    },
+  ];
+
+  for (const rec of recommendations) {
+    await prisma.aiRecommendation.create({
+      data: {
+        userId: alexUser.id,
+        ...rec,
+      },
+    });
+  }
+  console.log('Seeded AI recommendations.');
+
+  // Seed Notifications for Alex
+  const notifications = [
+    {
+      title: 'Welcome to AI Digital Twin',
+      message: 'Hi Alex! Your personalized Digital Twin and AI advisor features are active.',
+      type: 'INFO',
+      isRead: false,
+    },
+    {
+      title: 'Target Target Exceeded Alert',
+      message: 'Warning: Your housing costs exceed 30% of your income. Evaluate non-essential costs.',
+      type: 'ALERT',
+      isRead: false,
+    },
+  ];
+
+  for (const notif of notifications) {
+    await prisma.notification.create({
+      data: {
+        userId: alexUser.id,
+        ...notif,
+      },
+    });
+  }
+  console.log('Seeded notifications.');
+
+  // Seed Activity History for Alex
   const activities = [
     {
       activityType: 'User Registered',
@@ -212,7 +311,7 @@ async function main() {
   for (const act of activities) {
     await prisma.activityHistory.create({
       data: {
-        userId: demoUser.id,
+        userId: alexUser.id,
         ...act,
       },
     });
