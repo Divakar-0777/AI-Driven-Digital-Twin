@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
+import PredictiveAnalytics from './pages/PredictiveAnalytics';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
           {/* Secure Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/finance" element={<Finance />} />
             <Route path="/study" element={<Study />} />

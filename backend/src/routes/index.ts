@@ -26,8 +26,30 @@ import { getTwinState, syncTwinState } from '../controllers/digitalTwinControlle
 import { getRecommendations, applyRecommendation } from '../controllers/recommendationController';
 import { getNotifications, readNotification, deleteNotification } from '../controllers/notificationController';
 import { authenticateToken } from '../middleware/auth';
+import {
+  predictFinance,
+  forecastFinance,
+  predictStudy,
+  forecastStudy,
+  predictHabits,
+  forecastHabits,
+  getAnalyticsDashboard,
+  getAnalyticsRecommendations,
+  getAnalyticsTrends,
+} from '../controllers/analyticsController';
 
 const router = Router();
+
+// --- Predictive Analytics (Protected) ---
+router.post('/predict/finance', authenticateToken as any, predictFinance);
+router.get('/forecast/finance', authenticateToken as any, forecastFinance);
+router.post('/predict/study', authenticateToken as any, predictStudy);
+router.get('/forecast/study', authenticateToken as any, forecastStudy);
+router.post('/predict/habits', authenticateToken as any, predictHabits);
+router.get('/forecast/habits', authenticateToken as any, forecastHabits);
+router.get('/analytics/dashboard', authenticateToken as any, getAnalyticsDashboard);
+router.get('/analytics/recommendations', authenticateToken as any, getAnalyticsRecommendations);
+router.get('/analytics/trends', authenticateToken as any, getAnalyticsTrends);
 
 // --- Authentication ---
 router.post('/register', register);

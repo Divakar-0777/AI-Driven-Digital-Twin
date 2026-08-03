@@ -22,6 +22,8 @@ model User {
   digitalTwinState     DigitalTwinState?
   aiRecommendations    AiRecommendation[]
   notifications        Notification[]
+  predictionHistory    PredictionHistory[]
+  analyticsSummary     AnalyticsSummary?
 
   @@map("Users")
 }
@@ -153,4 +155,32 @@ model Notification {
   @@index([userId])
   @@index([createdAt])
   @@map("Notifications")
+}
+
+model PredictionHistory {
+  id               String   @id @default(uuid())
+  userId           String
+  predictionType   String   // 'FINANCE', 'STUDY', 'HABITS'
+  predictionResult Json     // Stores predictions and parameters
+  confidenceScore  Float    // Score between 0 and 1
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("PredictionHistories")
+}
+
+model AnalyticsSummary {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  financialHealthScore Float    @default(0.0)
+  productivityScore    Float    @default(0.0)
+  habitScore           Float    @default(0.0)
+  overallAIScore       Float    @default(0.0)
+  updatedAt            DateTime @updatedAt
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("AnalyticsSummaries")
 }

@@ -7,7 +7,8 @@ import {
   BookOpen, 
   CheckSquare, 
   User as UserIcon, 
-  LogOut 
+  LogOut,
+  Brain
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -17,6 +18,7 @@ export const Sidebar: React.FC = () => {
 
   const menuItems = [
     { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+    { name: 'Predictive AI', path: '/predictive-analytics', icon: <Brain size={20} /> },
     { name: 'Finance', path: '/finance', icon: <DollarSign size={20} /> },
     { name: 'Study Tracker', path: '/study', icon: <BookOpen size={20} /> },
     { name: 'Habits', path: '/habits', icon: <CheckSquare size={20} /> },
