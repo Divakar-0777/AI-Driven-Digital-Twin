@@ -1,4 +1,4 @@
-# AI-powered Personal Productivity & Finance Assistant - Milestone 1
+# AI-powered Personal Productivity & Finance Assistant - Milestone 2
 
 
 
