@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from app.routes import finance, study, habits, analytics
+from app.routes import finance, study, habits, analytics, chat, decision_simulation
 
 app = FastAPI(
     title="AI Personal Productivity & Finance Assistant - AI Microservice",
@@ -28,6 +28,8 @@ app.include_router(finance.router, tags=["Finance"])
 app.include_router(study.router, tags=["Study"])
 app.include_router(habits.router, tags=["Habits"])
 app.include_router(analytics.router, tags=["Analytics"])
+app.include_router(chat.router, tags=["Chat"])
+app.include_router(decision_simulation.router, tags=["Decision Simulation"])
 
 @app.get("/")
 def read_root():

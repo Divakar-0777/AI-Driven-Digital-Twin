@@ -6,17 +6,21 @@ import { ProfileRepository } from '../repositories/ProfileRepository';
 import { PredictionHistoryRepository } from '../repositories/PredictionHistoryRepository';
 import { AnalyticsSummaryRepository } from '../repositories/AnalyticsSummaryRepository';
 import { AiRecommendationRepository } from '../repositories/AiRecommendationRepository';
+import { BudgetRepository } from '../repositories/BudgetRepository';
+import { GoalRepository } from '../repositories/GoalRepository';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
 export class AiAnalyticsService {
   
   private static async getPayload(userId: string) {
-    const [profile, transactions, sessions, habits] = await Promise.all([
+    const [profile, transactions, sessions, habits, budgets, goals] = await Promise.all([
       ProfileRepository.findByUserId(userId),
       FinanceRepository.findByUserId(userId),
       StudyRepository.findByUserId(userId),
       HabitRepository.findByUserId(userId),
+      BudgetRepository.findByUserId(userId),
+      GoalRepository.findByUserId(userId),
     ]);
 
     // Format fields for Python compatibility
@@ -42,10 +46,29 @@ export class AiAnalyticsService {
       targetFrequency: h.targetFrequency,
     }));
 
+    const formattedBudgets = budgets.map(b => ({
+      category: b.category,
+      monthlyLimit: Number(b.monthlyLimit),
+      currentSpending: Number(b.currentSpending),
+      period: b.period,
+    }));
+
+    const formattedGoals = goals.map(g => ({
+      goalName: g.goalName,
+      targetAmount: Number(g.targetAmount),
+      currentAmount: Number(g.currentAmount),
+      monthlyContribution: Number(g.monthlyContribution),
+      targetDate: g.targetDate.toISOString(),
+      goalCategory: g.goalCategory,
+      status: g.status,
+    }));
+
     return {
       transactions: formattedTransactions,
       sessions: formattedSessions,
       habits: formattedHabits,
+      budgets: formattedBudgets,
+      goals: formattedGoals,
       monthlyIncome: profile ? Number(profile.monthlyIncome) : 5000.0,
       monthlyExpenseTarget: profile ? Number(profile.monthlyExpenseTarget) : 2500.0,
       dailyStudyHoursTarget: profile ? Number(profile.dailyStudyHoursTarget) : 2.5,
@@ -59,7 +82,9 @@ export class AiAnalyticsService {
       profile: {
         monthlyIncome: payload.monthlyIncome,
         monthlyExpenseTarget: payload.monthlyExpenseTarget,
-      }
+      },
+      budgets: payload.budgets,
+      goals: payload.goals,
     }, {
       headers: { Authorization: `Bearer ${token}` }
     });

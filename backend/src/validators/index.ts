@@ -68,3 +68,43 @@ export const HabitSchema = z.object({
   completed: z.boolean().optional().default(false),
   date: z.string().datetime().or(z.string().date()).optional().default(() => new Date().toISOString().split('T')[0]),
 });
+
+export const BudgetSchema = z.object({
+  category: z.string().min(1, 'Category is required'),
+  monthlyLimit: z.number().positive('Monthly limit must be greater than 0'),
+  period: z.string().optional().default('MONTHLY'),
+  status: z.string().optional().default('ACTIVE'),
+});
+
+export const GoalSchema = z.object({
+  goalName: z.string().min(1, 'Goal name is required'),
+  targetAmount: z.number().positive('Target amount must be greater than 0'),
+  currentAmount: z.number().nonnegative('Current amount must be a positive number').optional().default(0),
+  monthlyContribution: z.number().nonnegative('Monthly contribution must be a positive number').optional().default(0),
+  targetDate: z.string().datetime().or(z.string().date()),
+  priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional().default('MEDIUM'),
+  goalCategory: z.string().min(1, 'Goal category is required'),
+  status: z.string().optional().default('ACTIVE'),
+});
+
+export const SimulationSchema = z.object({
+  scenarioName: z.string().min(1, 'Scenario name is required'),
+  assumptions: z.string().min(1, 'Assumptions are required'),
+  projectedIncome: z.number().nonnegative(),
+  projectedExpenses: z.number().nonnegative(),
+  projectedSavings: z.number(),
+  projectedBalance: z.number(),
+  goalImpact: z.string().optional().nullable(),
+  riskLevel: z.enum(['LOW', 'MODERATE', 'HIGH']).optional().default('LOW'),
+});
+
+export const DecisionSimulationInputSchema = z.object({
+  decisionName: z.string().min(1, 'Decision name is required'),
+  category: z.string().min(1, 'Category is required'),
+  action: z.string().min(1, 'Action is required'),
+  parameters: z.record(z.any()).default({}),
+  affectedDomains: z.array(z.string()).min(1, 'At least one affected domain is required'),
+  horizon: z.string().min(1, 'Simulation horizon is required'),
+  selectedGoals: z.array(z.string()).optional().default([]),
+  userPriorities: z.record(z.number()).default({}),
+});

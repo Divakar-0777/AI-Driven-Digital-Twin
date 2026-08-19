@@ -24,6 +24,10 @@ model User {
   notifications        Notification[]
   predictionHistory    PredictionHistory[]
   analyticsSummary     AnalyticsSummary?
+  budgets              Budget[]
+  financialGoals       FinancialGoal[]
+  financialSimulations FinancialSimulation[]
+  decisionSimulations  DecisionSimulation[]
 
   @@map("Users")
 }
@@ -51,15 +55,17 @@ model Profile {
 }
 
 model FinancialTransaction {
-  id            String   @id @default(uuid())
-  userId        String
-  title         String
-  category      String
-  type          String   // 'INCOME' or 'EXPENSE'
-  amount        Decimal
-  date          DateTime @default(now())
-  paymentMethod String
-  notes         String?
+  id                  String   @id @default(uuid())
+  userId              String
+  title               String
+  category            String
+  type                String   // 'INCOME' or 'EXPENSE'
+  amount              Decimal
+  date                DateTime @default(now())
+  paymentMethod       String
+  notes               String?
+  recurring           Boolean  @default(false)
+  recurrenceFrequency String?  // 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -183,4 +189,78 @@ model AnalyticsSummary {
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("AnalyticsSummaries")
+}
+
+model Budget {
+  id              String   @id @default(uuid())
+  userId          String
+  category        String
+  monthlyLimit    Decimal
+  currentSpending Decimal  @default(0.00)
+  period          String   @default("MONTHLY") // 'MONTHLY', 'WEEKLY'
+  status          String   @default("ACTIVE")  // 'ACTIVE', 'INACTIVE'
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("Budgets")
+}
+
+model FinancialGoal {
+  id                  String   @id @default(uuid())
+  userId              String
+  goalName            String
+  targetAmount        Decimal
+  currentAmount       Decimal  @default(0.00)
+  monthlyContribution Decimal  @default(0.00)
+  targetDate          DateTime
+  priority            String   @default("MEDIUM") // 'HIGH', 'MEDIUM', 'LOW'
+  goalCategory        String   // 'EMERGENCY_FUND', 'LAPTOP', 'EDUCATION', 'TRAVEL', etc.
+  status              String   @default("ACTIVE") // 'ACTIVE', 'ACHIEVED', 'FAILED'
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("FinancialGoals")
+}
+
+model FinancialSimulation {
+  id                String   @id @default(uuid())
+  userId            String
+  scenarioName      String
+  assumptions       String   // JSON string containing scenario parameters
+  projectedIncome   Decimal
+  projectedExpenses Decimal
+  projectedSavings  Decimal
+  projectedBalance  Decimal
+  goalImpact        String?
+  riskLevel         String   @default("LOW") // 'LOW', 'MODERATE', 'HIGH'
+  createdAt         DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("FinancialSimulations")
+}
+
+model DecisionSimulation {
+  id             String   @id @default(uuid())
+  userId         String
+  decision       String   // JSON string representing decision inputs (category, action, parameters, horizon)
+  baseline       String   // JSON string representing the "Current Path" outcome
+  scenarios      String   // JSON string of generated alternative scenarios
+  assumptions    String   // JSON string of explicit transparency rules/assumptions
+  outcomes       String   // JSON string of projected future states per domain
+  comparison     String   // JSON string of normalized side-by-side comparisons
+  recommendation String   // JSON string of final recommendations, trade-offs, and ranking
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("DecisionSimulations")
 }

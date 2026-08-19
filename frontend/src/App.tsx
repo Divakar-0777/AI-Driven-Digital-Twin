@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Finance from './pages/Finance';
 import Study from './pages/Study';
 import Habits from './pages/Habits';
+import ChatAssistant from './components/ChatAssistant';
 
 export const App: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ export const App: React.FC = () => {
           {/* Fallback to Dashboard */}
           <Route path="*" element={<Dashboard />} />
         </Routes>
+        <ChatAssistant />
       </BrowserRouter>
     </AuthProvider>
   );

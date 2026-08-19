@@ -7,7 +7,33 @@ import {
   updateTransaction,
   deleteTransaction,
   getMonthlySummary,
+  importTransactions,
+  exportTransactions,
 } from '../controllers/financeController';
+import {
+  createBudget,
+  getBudgets,
+  deleteBudget,
+} from '../controllers/budgetController';
+import {
+  createGoal,
+  getGoals,
+  updateGoal,
+  deleteGoal,
+} from '../controllers/goalController';
+import {
+  createSimulation,
+  getSimulations,
+  deleteSimulation,
+} from '../controllers/simulationController';
+import {
+  runDecisionSimulation,
+  createDecisionSimulation,
+  getDecisionSimulations,
+  getDecisionSimulationById,
+  deleteDecisionSimulation,
+} from '../controllers/decisionSimulationController';
+import { handleChat } from '../controllers/chatController';
 import {
   addStudySession,
   getStudySessions,
@@ -66,6 +92,34 @@ router.post('/transactions', authenticateToken as any, addTransaction);
 router.get('/transactions', authenticateToken as any, getTransactions);
 router.put('/transactions/:id', authenticateToken as any, updateTransaction);
 router.delete('/transactions/:id', authenticateToken as any, deleteTransaction);
+router.post('/transactions/import', authenticateToken as any, importTransactions);
+router.get('/transactions/export', authenticateToken as any, exportTransactions);
+
+// --- Category Budgets (Protected) ---
+router.get('/finance/budgets', authenticateToken as any, getBudgets);
+router.post('/finance/budgets', authenticateToken as any, createBudget);
+router.delete('/finance/budgets/:id', authenticateToken as any, deleteBudget);
+
+// --- Savings Goals (Protected) ---
+router.get('/finance/goals', authenticateToken as any, getGoals);
+router.post('/finance/goals', authenticateToken as any, createGoal);
+router.put('/finance/goals/:id', authenticateToken as any, updateGoal);
+router.delete('/finance/goals/:id', authenticateToken as any, deleteGoal);
+
+// --- What If Simulations (Protected) ---
+router.get('/finance/simulations', authenticateToken as any, getSimulations);
+router.post('/finance/simulate', authenticateToken as any, createSimulation);
+router.delete('/finance/simulations/:id', authenticateToken as any, deleteSimulation);
+
+// --- Decision Simulations (Protected) ---
+router.post('/decision-simulations/run', authenticateToken as any, runDecisionSimulation);
+router.post('/decision-simulations', authenticateToken as any, createDecisionSimulation);
+router.get('/decision-simulations', authenticateToken as any, getDecisionSimulations);
+router.get('/decision-simulations/:id', authenticateToken as any, getDecisionSimulationById);
+router.delete('/decision-simulations/:id', authenticateToken as any, deleteDecisionSimulation);
+
+// --- AI Chat Assistant (Protected) ---
+router.post('/chat', authenticateToken as any, handleChat);
 
 // --- Study (Protected) ---
 router.get('/study/total-hours', authenticateToken as any, getTotalStudyHours);

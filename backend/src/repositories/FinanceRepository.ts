@@ -8,6 +8,8 @@ export interface TransactionInput {
   date?: Date;
   paymentMethod: string;
   notes?: string | null;
+  recurring?: boolean;
+  recurrenceFrequency?: string | null;
 }
 
 export class FinanceRepository {
@@ -17,6 +19,41 @@ export class FinanceRepository {
         userId,
         ...data,
       },
+    });
+  }
+
+  static async bulkAddTransactions(userId: string, data: TransactionInput[]) {
+    return prisma.$transaction(async (tx) => {
+      const results = [];
+      for (const item of data) {
+        const dateVal = item.date ? new Date(item.date) : new Date();
+        const start = new Date(dateVal.getTime() - 60000);
+        const end = new Date(dateVal.getTime() + 60000);
+        
+        const existing = await tx.financialTransaction.findFirst({
+          where: {
+            userId,
+            title: item.title,
+            amount: item.amount,
+            type: item.type,
+            date: {
+              gte: start,
+              lte: end
+            }
+          }
+        });
+
+        if (!existing) {
+          const created = await tx.financialTransaction.create({
+            data: {
+              userId,
+              ...item,
+            }
+          });
+          results.push(created);
+        }
+      }
+      return results;
     });
   }
 
@@ -42,6 +79,7 @@ export class FinanceRepository {
           lt: endDate,
         },
       },
+      orderBy: { date: 'asc' },
     });
   }
 
