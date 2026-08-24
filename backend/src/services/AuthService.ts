@@ -132,4 +132,35 @@ export class AuthService {
       },
     };
   }
+
+  static async getMe(userId: string) {
+    const user = await UserRepository.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.profile?.fullName || 'User',
+      phoneNumber: user.profile?.phoneNumber || null,
+      dateOfBirth: user.profile?.dateOfBirth || null,
+      gender: (user.profile as any)?.gender || null,
+      occupation: user.profile?.occupation || null,
+      educationLevel: user.profile?.educationLevel || null,
+      monthlyIncome: user.profile ? Number(user.profile.monthlyIncome) : 0,
+      monthlyExpenseTarget: user.profile ? Number(user.profile.monthlyExpenseTarget) : 0,
+      savings: user.profile ? Number((user.profile as any)?.savings || 0) : 0,
+      studyGoal: user.profile?.studyGoal || null,
+      dailyStudyHoursTarget: user.profile ? Number(user.profile.dailyStudyHoursTarget) : 0,
+      fitnessGoal: (user.profile as any)?.fitnessGoal || null,
+      lifestyleInfo: (user.profile as any)?.lifestyleInfo || null,
+      longTermGoals: (user.profile as any)?.longTermGoals || null,
+      habitGoals: user.profile?.habitGoals || null,
+      profilePhotoUrl: user.profile?.profilePhotoUrl || null,
+      financialGoals: user.profile?.financialGoals || null,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
 }

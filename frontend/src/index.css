@@ -188,7 +188,68 @@ input.invalid:focus, select.invalid:focus, textarea.invalid:focus {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Grid & Layout layouts */
+/* Dark mode support */
+.dark, [data-theme="dark"] {
+  color-scheme: dark;
+  color: #e2e8f0;
+  background-color: #0f172a;
+}
+
+.dark body, [data-theme="dark"] body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.dark .glass-panel, [data-theme="dark"] .glass-panel {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(99, 102, 241, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-card, [data-theme="dark"] .glass-card {
+  background: rgba(30, 41, 59, 0.6);
+}
+
+.dark input, .dark select, .dark textarea,
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.15);
+  color: #e2e8f0;
+}
+
+.dark input::placeholder, [data-theme="dark"] input::placeholder {
+  color: #94a3b8;
+}
+
+.dark .btn-secondary, [data-theme="dark"] .btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+/* Sidebar dark mode */
+.dark > div:first-child, [data-theme="dark"] > div:first-child {
+  background: rgba(15, 23, 42, 0.9);
+  border-right-color: rgba(99, 102, 241, 0.12);
+}
+
+/* Spinning animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  main {
+    margin-left: 0 !important;
+    padding: 20px !important;
+  }
+}
+
+/* Grid & Layout */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

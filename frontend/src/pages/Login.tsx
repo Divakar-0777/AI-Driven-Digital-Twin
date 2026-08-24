@@ -132,6 +132,9 @@ export const Login: React.FC = () => {
               <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)' }}>
                 Password
               </label>
+              <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+                Forgot Password?
+              </Link>
             </div>
             <input
               id="login-password"

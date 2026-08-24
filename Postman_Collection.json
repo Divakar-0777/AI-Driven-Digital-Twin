@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "8c459f20-b4ef-479c-b17b-23f2fcf2bf90",
-    "name": "AI Personal Productivity & Finance Assistant - Milestone 1",
-    "description": "Postman Collection for Milestone 1 REST API testing, including User Profile Management, Finance Tracker, Study Sessions, Habits Tracker, and Activity logs.",
+    "name": "AI Personal Productivity & Finance Assistant",
+    "description": "Postman Collection for Digital Twin REST API testing, including User Profile Management, Finance Tracker, Study Sessions, Habits Tracker, and Activity logs.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.routes import finance, study, habits, analytics, chat, decision_simulation
+from app.routes import recommend
 
 app = FastAPI(
     title="AI Personal Productivity & Finance Assistant - AI Microservice",
@@ -30,6 +31,7 @@ app.include_router(habits.router, tags=["Habits"])
 app.include_router(analytics.router, tags=["Analytics"])
 app.include_router(chat.router, tags=["Chat"])
 app.include_router(decision_simulation.router, tags=["Decision Simulation"])
+app.include_router(recommend.router, tags=["Recommendations"])
 
 @app.get("/")
 def read_root():
@@ -38,6 +40,14 @@ def read_root():
         "service": "AI Microservice",
         "framework": "FastAPI",
         "models": ["LinearRegression", "RandomForest", "XGBoost", "Prophet"]
+    }
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "AI Microservice",
+        "version": "1.0.0"
     }
 
 if __name__ == "__main__":

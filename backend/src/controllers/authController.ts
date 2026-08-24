@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { RegisterSchema, LoginSchema } from '../validators';
 import { AuthService } from '../services/AuthService';
+import { AuthRequest } from '../middleware/auth';
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: AuthRequest, res: Response) => {
   try {
     const parseResult = RegisterSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -17,7 +18,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: AuthRequest, res: Response) => {
   try {
     const parseResult = LoginSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -30,5 +31,16 @@ export const login = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Login Controller Error:', error);
     return res.status(401).json({ error: error.message || 'Internal Server Error' });
+  }
+};
+
+export const getMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId!;
+    const result = await AuthService.getMe(userId);
+    return res.status(200).json(result);
+  } catch (error: any) {
+    console.error('Get Me Error:', error);
+    return res.status(404).json({ error: error.message || 'Internal Server Error' });
   }
 };

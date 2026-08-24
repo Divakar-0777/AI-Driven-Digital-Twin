@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login } from '../controllers/authController';
+import { register, login, getMe } from '../controllers/authController';
 import { getProfile, updateProfile, deleteProfile } from '../controllers/profileController';
 import {
   addTransaction,
@@ -33,7 +33,7 @@ import {
   getDecisionSimulationById,
   deleteDecisionSimulation,
 } from '../controllers/decisionSimulationController';
-import { handleChat } from '../controllers/chatController';
+import { handleChat, getConversations, getConversationById, deleteConversation } from '../controllers/chatController';
 import {
   addStudySession,
   getStudySessions,
@@ -63,6 +63,13 @@ import {
   getAnalyticsRecommendations,
   getAnalyticsTrends,
 } from '../controllers/analyticsController';
+import {
+  createGenericGoal,
+  getGenericGoals,
+  updateGenericGoal,
+  deleteGenericGoal,
+} from '../controllers/genericGoalController';
+import { getRecommendationsV2 } from '../controllers/recommendationController';
 
 const router = Router();
 
@@ -80,6 +87,7 @@ router.get('/analytics/trends', authenticateToken as any, getAnalyticsTrends);
 // --- Authentication ---
 router.post('/register', register);
 router.post('/login', login);
+router.get('/auth/me', authenticateToken as any, getMe);
 
 // --- Profile (Protected) ---
 router.get('/profile', authenticateToken as any, getProfile);
@@ -120,6 +128,15 @@ router.delete('/decision-simulations/:id', authenticateToken as any, deleteDecis
 
 // --- AI Chat Assistant (Protected) ---
 router.post('/chat', authenticateToken as any, handleChat);
+router.get('/chat/conversations', authenticateToken as any, getConversations);
+router.get('/chat/conversations/:id', authenticateToken as any, getConversationById);
+router.delete('/chat/conversations/:id', authenticateToken as any, deleteConversation);
+
+// --- Generic Goals (Protected) ---
+router.get('/goals', authenticateToken as any, getGenericGoals);
+router.post('/goals', authenticateToken as any, createGenericGoal);
+router.put('/goals/:id', authenticateToken as any, updateGenericGoal);
+router.delete('/goals/:id', authenticateToken as any, deleteGenericGoal);
 
 // --- Study (Protected) ---
 router.get('/study/total-hours', authenticateToken as any, getTotalStudyHours);

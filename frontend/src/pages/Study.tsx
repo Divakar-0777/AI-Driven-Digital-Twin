@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { Plus, Edit2, Trash2, BookOpen, Clock, BarChart3, Calendar, X, Star } from 'lucide-react';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  BookOpen,
+  Clock,
+  BarChart3,
+  Calendar,
+  X,
+  Star
+} from 'lucide-react';
 
 interface StudySession {
   id: string;
   subject: string;
   topic: string;
-  duration: number; // in mins
+  duration: number;
   date: string;
   productivityRating: number;
   notes?: string;
@@ -26,7 +36,6 @@ export const Study: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Form State
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
@@ -41,10 +50,12 @@ export const Study: React.FC = () => {
   const fetchStudyData = async () => {
     try {
       setLoading(true);
+
       const [sessionsRes, hoursRes] = await Promise.all([
         api.get('/study'),
         api.get('/study/total-hours'),
       ]);
+
       setSessions(sessionsRes.data);
       setSummary(hoursRes.data);
     } catch (err: any) {
@@ -107,6 +118,7 @@ export const Study: React.FC = () => {
       } else {
         await api.post('/study', payload);
       }
+
       setShowModal(false);
       fetchStudyData();
     } catch (err: any) {
@@ -116,6 +128,7 @@ export const Study: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this study session?')) return;
+
     try {
       await api.delete(`/study/${id}`);
       fetchStudyData();
@@ -124,137 +137,436 @@ export const Study: React.FC = () => {
     }
   };
 
+  const pageBackground = '#f8fafc';
+  const cardBackground = '#ffffff';
+  const primaryText = '#1e293b';
+  const secondaryText = '#64748b';
+  const borderColor = '#e2e8f0';
+  const primaryColor = '#4f46e5';
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        background: pageBackground
+      }}
+    >
       <Sidebar />
 
-      <main style={{ flex: 1, marginLeft: '260px', padding: '40px', boxSizing: 'border-box' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <main
+        style={{
+          flex: 1,
+          marginLeft: '260px',
+          padding: '40px',
+          boxSizing: 'border-box',
+          background: pageBackground,
+          minHeight: '100vh'
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '32px'
+          }}
+        >
           <div>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-highlight)' }}>Study Tracker</h2>
-            <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>
+            <h2
+              style={{
+                fontSize: '2.25rem',
+                fontWeight: 800,
+                color: primaryText,
+                margin: 0
+              }}
+            >
+              Study Tracker
+            </h2>
+
+            <p
+              style={{
+                color: secondaryText,
+                marginTop: '8px',
+                marginBottom: 0,
+                fontSize: '1rem'
+              }}
+            >
               Log academic sessions, specify topics, record durations, and audit learning productivity.
             </p>
           </div>
-          <button id="btn-add-study" onClick={openAddModal} className="btn-primary">
+
+          <button
+            id="btn-add-study"
+            onClick={openAddModal}
+            className="btn-primary"
+          >
             <Plus size={18} /> Log Study Session
           </button>
         </div>
 
+        {/* Error */}
         {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid var(--danger)',
-            color: '#fca5a5',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '24px'
-          }}>
+          <div
+            style={{
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#dc2626',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              marginBottom: '24px'
+            }}
+          >
             {error}
           </div>
         )}
 
-        {/* Study aggregates summary */}
+        {/* Summary Cards */}
         {summary && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
-            <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '12px', borderRadius: '10px', color: 'var(--primary)' }}>
-                <Clock size={24} />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '24px',
+              marginBottom: '32px'
+            }}
+          >
+            {/* Total Hours */}
+            <div
+              style={{
+                background: cardBackground,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '18px',
+                padding: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+                boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)'
+              }}
+            >
+              <div
+                style={{
+                  background: '#eef2ff',
+                  padding: '14px',
+                  borderRadius: '12px',
+                  color: '#4f46e5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Clock size={26} />
               </div>
+
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Total Study Hours</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', marginTop: '2px' }}>
+                <span
+                  style={{
+                    fontSize: '0.9rem',
+                    color: secondaryText,
+                    fontWeight: 500
+                  }}
+                >
+                  Total Study Hours
+                </span>
+
+                <div
+                  style={{
+                    fontSize: '1.8rem',
+                    fontWeight: 800,
+                    color: primaryText,
+                    marginTop: '5px'
+                  }}
+                >
                   {summary.totalHours.toFixed(1)} hrs
                 </div>
               </div>
             </div>
-            <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '12px', borderRadius: '10px', color: 'var(--success)' }}>
-                <BookOpen size={24} />
+
+            {/* Sessions */}
+            <div
+              style={{
+                background: cardBackground,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '18px',
+                padding: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+                boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)'
+              }}
+            >
+              <div
+                style={{
+                  background: '#ecfdf5',
+                  padding: '14px',
+                  borderRadius: '12px',
+                  color: '#059669',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <BookOpen size={26} />
               </div>
+
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sessions Tracked</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', marginTop: '2px' }}>
+                <span
+                  style={{
+                    fontSize: '0.9rem',
+                    color: secondaryText,
+                    fontWeight: 500
+                  }}
+                >
+                  Sessions Tracked
+                </span>
+
+                <div
+                  style={{
+                    fontSize: '1.8rem',
+                    fontWeight: 800,
+                    color: primaryText,
+                    marginTop: '5px'
+                  }}
+                >
                   {summary.sessionCount}
                 </div>
               </div>
             </div>
-            <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '12px', borderRadius: '10px', color: 'var(--warning)' }}>
-                <BarChart3 size={24} />
+
+            {/* Productivity */}
+            <div
+              style={{
+                background: cardBackground,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '18px',
+                padding: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+                boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)'
+              }}
+            >
+              <div
+                style={{
+                  background: '#fff7ed',
+                  padding: '14px',
+                  borderRadius: '12px',
+                  color: '#d97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <BarChart3 size={26} />
               </div>
+
               <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Average Productivity</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  ★ {summary.averageProductivity.toFixed(1)} / 5
+                <span
+                  style={{
+                    fontSize: '0.9rem',
+                    color: secondaryText,
+                    fontWeight: 500
+                  }}
+                >
+                  Average Productivity
+                </span>
+
+                <div
+                  style={{
+                    fontSize: '1.8rem',
+                    fontWeight: 800,
+                    color: primaryText,
+                    marginTop: '5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span style={{ color: '#f59e0b' }}>★</span>
+                  {summary.averageProductivity.toFixed(1)} / 5
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Sessions History Table */}
-        <div className="glass-panel" style={{ padding: '24px', overflowX: 'auto' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: '20px' }}>
+        {/* Study History */}
+        <div
+          style={{
+            background: cardBackground,
+            border: `1px solid ${borderColor}`,
+            borderRadius: '18px',
+            padding: '28px',
+            overflowX: 'auto',
+            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)'
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: primaryText,
+              marginBottom: '22px',
+              marginTop: 0
+            }}
+          >
             Study Log History
           </h3>
 
           {loading ? (
-            <div>Loading Sessions...</div>
+            <div style={{ color: secondaryText }}>Loading Sessions...</div>
           ) : sessions.length === 0 ? (
-            <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                color: secondaryText,
+                padding: '40px 0'
+              }}
+            >
               No study sessions tracked yet. Click Log Study Session to record one.
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                textAlign: 'left',
+                fontSize: '0.9rem'
+              }}
+            >
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Subject</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Topic</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Duration</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Productivity Rating</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Date</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Notes</th>
-                  <th style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>Actions</th>
+                <tr
+                  style={{
+                    borderBottom: `1px solid ${borderColor}`,
+                    background: '#f8fafc'
+                  }}
+                >
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Subject</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Topic</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Duration</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Productivity Rating</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Date</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Notes</th>
+                  <th style={{ padding: '14px 16px', color: secondaryText }}>Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {sessions.map((s) => (
-                  <tr key={s.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                    <td style={{ padding: '16px', fontWeight: 600, color: 'white' }}>{s.subject}</td>
-                    <td style={{ padding: '16px', color: 'var(--text-muted)' }}>{s.topic}</td>
-                    <td style={{ padding: '16px', fontWeight: 700, color: 'var(--primary)' }}>{s.duration} mins</td>
+                  <tr
+                    key={s.id}
+                    style={{
+                      borderBottom: `1px solid ${borderColor}`
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: '16px',
+                        fontWeight: 600,
+                        color: primaryText
+                      }}
+                    >
+                      {s.subject}
+                    </td>
+
+                    <td style={{ padding: '16px', color: secondaryText }}>
+                      {s.topic}
+                    </td>
+
+                    <td
+                      style={{
+                        padding: '16px',
+                        fontWeight: 700,
+                        color: primaryColor
+                      }}
+                    >
+                      {s.duration} mins
+                    </td>
+
                     <td style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', gap: '2px', color: 'var(--warning)' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '2px',
+                          color: '#f59e0b'
+                        }}
+                      >
                         {Array.from({ length: s.productivityRating }).map((_, i) => (
-                          <Star key={i} size={14} fill="currentColor" />
+                          <Star
+                            key={i}
+                            size={14}
+                            fill="currentColor"
+                          />
                         ))}
+
                         {Array.from({ length: 5 - s.productivityRating }).map((_, i) => (
-                          <Star key={i} size={14} />
+                          <Star
+                            key={i}
+                            size={14}
+                            color="#cbd5e1"
+                          />
                         ))}
                       </div>
                     </td>
-                    <td style={{ padding: '16px', color: 'var(--text-muted)' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={14} /> {new Date(s.date).toLocaleDateString()}
+
+                    <td
+                      style={{
+                        padding: '16px',
+                        color: secondaryText
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <Calendar size={14} />
+                        {new Date(s.date).toLocaleDateString()}
                       </span>
                     </td>
-                    <td style={{ padding: '16px', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+
+                    <td
+                      style={{
+                        padding: '16px',
+                        color: secondaryText,
+                        maxWidth: '200px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
                       {s.notes || '-'}
                     </td>
+
                     <td style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', gap: '10px' }}>
+                      <div style={{ display: 'flex', gap: '14px' }}>
                         <button
                           onClick={() => openEditModal(s)}
-                          style={{ background: 'transparent', border: 'none', color: 'var(--primary)', padding: 0, cursor: 'pointer' }}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: primaryColor,
+                            padding: 0,
+                            cursor: 'pointer'
+                          }}
                         >
-                          <Edit2 size={16} />
+                          <Edit2 size={17} />
                         </button>
+
                         <button
                           onClick={() => handleDelete(s.id)}
-                          style={{ background: 'transparent', border: 'none', color: 'var(--danger)', padding: 0, cursor: 'pointer' }}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#dc2626',
+                            padding: 0,
+                            cursor: 'pointer'
+                          }}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={17} />
                         </button>
                       </div>
                     </td>
@@ -265,34 +577,88 @@ export const Study: React.FC = () => {
           )}
         </div>
 
-        {/* Modal Form */}
+        {/* Modal */}
         {showModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(4px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div className="glass-panel" style={{ width: '100%', maxWidth: '480px', padding: '32px', boxSizing: 'border-box' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)' }}>
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(15, 23, 42, 0.45)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '480px',
+                padding: '32px',
+                boxSizing: 'border-box',
+                background: '#ffffff',
+                borderRadius: '18px',
+                border: `1px solid ${borderColor}`,
+                boxShadow: '0 20px 60px rgba(15, 23, 42, 0.2)'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '24px'
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: primaryText,
+                    margin: 0
+                  }}
+                >
                   {isEditing ? 'Edit Study Session' : 'Record Study Session'}
                 </h3>
-                <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: 'white', padding: 0, cursor: 'pointer' }}>
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: primaryText,
+                    padding: 0,
+                    cursor: 'pointer'
+                  }}
+                >
                   <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <form
+                onSubmit={handleSubmit}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}
+              >
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Subject</label>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.85rem',
+                      color: secondaryText,
+                      marginBottom: '6px'
+                    }}
+                  >
+                    Subject
+                  </label>
+
                   <input
                     id="study-subject"
                     type="text"
@@ -304,7 +670,17 @@ export const Study: React.FC = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Topic</label>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.85rem',
+                      color: secondaryText,
+                      marginBottom: '6px'
+                    }}
+                  >
+                    Topic
+                  </label>
+
                   <input
                     id="study-topic"
                     type="text"
@@ -315,9 +691,25 @@ export const Study: React.FC = () => {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '16px'
+                  }}
+                >
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Duration (Minutes)</label>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '0.85rem',
+                        color: secondaryText,
+                        marginBottom: '6px'
+                      }}
+                    >
+                      Duration (Minutes)
+                    </label>
+
                     <input
                       id="study-duration"
                       type="number"
@@ -328,8 +720,19 @@ export const Study: React.FC = () => {
                       required
                     />
                   </div>
+
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Date</label>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '0.85rem',
+                        color: secondaryText,
+                        marginBottom: '6px'
+                      }}
+                    >
+                      Date
+                    </label>
+
                     <input
                       id="study-date"
                       type="date"
@@ -341,8 +744,24 @@ export const Study: React.FC = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '10px' }}>Productivity Rating</label>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.85rem',
+                      color: secondaryText,
+                      marginBottom: '10px'
+                    }}
+                  >
+                    Productivity Rating
+                  </label>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '12px',
+                      alignItems: 'center'
+                    }}
+                  >
                     {[1, 2, 3, 4, 5].map((rating) => (
                       <button
                         key={rating}
@@ -353,20 +772,47 @@ export const Study: React.FC = () => {
                           border: 'none',
                           padding: 0,
                           cursor: 'pointer',
-                          color: rating <= productivityRating ? 'var(--warning)' : 'var(--text-muted)'
+                          color:
+                            rating <= productivityRating
+                              ? '#f59e0b'
+                              : '#cbd5e1'
                         }}
                       >
-                        <Star size={28} fill={rating <= productivityRating ? 'currentColor' : 'none'} />
+                        <Star
+                          size={28}
+                          fill={
+                            rating <= productivityRating
+                              ? 'currentColor'
+                              : 'none'
+                          }
+                        />
                       </button>
                     ))}
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '8px' }}>
+
+                    <span
+                      style={{
+                        fontSize: '0.85rem',
+                        color: secondaryText,
+                        marginLeft: '8px'
+                      }}
+                    >
                       ({productivityRating} of 5)
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Notes</label>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.85rem',
+                      color: secondaryText,
+                      marginBottom: '6px'
+                    }}
+                  >
+                    Notes
+                  </label>
+
                   <textarea
                     id="study-notes"
                     value={notes}
@@ -375,11 +821,27 @@ export const Study: React.FC = () => {
                   />
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
-                  <button type="button" className="btn-secondary" onClick={() => setShowModal(false)} style={{ flex: 1 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '12px',
+                    marginTop: '10px'
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => setShowModal(false)}
+                    style={{ flex: 1 }}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="btn-primary" style={{ flex: 2 }}>
+
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ flex: 2 }}
+                  >
                     {isEditing ? 'Save Changes' : 'Log Session'}
                   </button>
                 </div>

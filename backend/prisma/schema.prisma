@@ -26,8 +26,10 @@ model User {
   analyticsSummary     AnalyticsSummary?
   budgets              Budget[]
   financialGoals       FinancialGoal[]
+  goals                Goal[]
   financialSimulations FinancialSimulation[]
   decisionSimulations  DecisionSimulation[]
+  chatConversations    ChatConversation[]
 
   @@map("Users")
 }
@@ -40,10 +42,16 @@ model Profile {
   dateOfBirth          DateTime?
   occupation           String?
   educationLevel       String?
+  gender               String?
   monthlyIncome        Decimal  @default(0.00)
   monthlyExpenseTarget Decimal  @default(0.00)
+  savings              Decimal  @default(0.00)
+  financialGoals       String?
   studyGoal            String?
   dailyStudyHoursTarget Float   @default(0.0)
+  fitnessGoal          String?
+  lifestyleInfo        String?
+  longTermGoals        String?
   habitGoals           String?
   profilePhotoUrl      String?
   createdAt            DateTime @default(now())
@@ -71,6 +79,8 @@ model FinancialTransaction {
 
   @@index([userId])
   @@index([date])
+  @@index([userId, type])
+  @@index([userId, category])
   @@map("FinancialTransactions")
 }
 
@@ -87,6 +97,8 @@ model StudySession {
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, date])
+  @@index([userId, subject])
   @@map("StudySessions")
 }
 
@@ -101,6 +113,8 @@ model Habit {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, date])
+  @@index([userId, name])
   @@map("Habits")
 }
 
@@ -109,8 +123,14 @@ model DigitalTwinState {
   userId               String   @unique
   productivityScore    Float    @default(0.0)
   financialHealthScore Float    @default(0.0)
+  habitScore           Float    @default(0.0)
+  studyScore           Float    @default(0.0)
+  goalScore            Float    @default(0.0)
+  overallScore         Float    @default(0.0)
   twinEmoticon         String   @default("😐")
   twinStatus           String   @default("Initializing")
+  personalitySummary   String?
+  behaviourSummary     String?
   syncTimestamp        DateTime @default(now())
 
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -121,8 +141,12 @@ model DigitalTwinState {
 model AiRecommendation {
   id                 String   @id @default(uuid())
   userId             String
-  category           String   // 'FINANCE', 'STUDY', 'HABITS'
+  category           String   // 'FINANCE', 'STUDY', 'HABITS', 'GOALS'
   recommendationText String
+  reason             String?
+  expectedImpact     String?
+  risk               String?
+  suggestedAction    String?
   impactLevel        String   // 'HIGH', 'MEDIUM', 'LOW'
   isApplied          Boolean  @default(false)
   createdAt          DateTime @default(now())
@@ -144,6 +168,7 @@ model ActivityHistory {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, timestamp])
   @@map("ActivityHistory")
 }
 
@@ -183,6 +208,8 @@ model AnalyticsSummary {
   financialHealthScore Float    @default(0.0)
   productivityScore    Float    @default(0.0)
   habitScore           Float    @default(0.0)
+  studyScore           Float    @default(0.0)
+  goalScore            Float    @default(0.0)
   overallAIScore       Float    @default(0.0)
   updatedAt            DateTime @updatedAt
 
@@ -228,6 +255,31 @@ model FinancialGoal {
   @@map("FinancialGoals")
 }
 
+model Goal {
+  id              String   @id @default(uuid())
+  userId          String
+  goalName        String
+  description     String?
+  goalType        String   // 'FINANCIAL', 'ACADEMIC', 'FITNESS', 'CAREER', 'PERSONAL', 'LIFESTYLE'
+  targetValue     Float
+  currentValue    Float    @default(0.0)
+  unit            String?  // 'dollars', 'hours', 'kg', 'count', etc.
+  deadline        DateTime?
+  priority        String   @default("MEDIUM") // 'HIGH', 'MEDIUM', 'LOW'
+  status          String   @default("ACTIVE") // 'ACTIVE', 'COMPLETED', 'FAILED', 'PAUSED'
+  progressPercent Float    @default(0.0)
+  riskLevel       String?  // 'LOW', 'MEDIUM', 'HIGH'
+  aiRecommendation String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, goalType])
+  @@map("Goals")
+}
+
 model FinancialSimulation {
   id                String   @id @default(uuid())
   userId            String
@@ -250,7 +302,7 @@ model FinancialSimulation {
 model DecisionSimulation {
   id             String   @id @default(uuid())
   userId         String
-  decision       String   // JSON string representing decision inputs (category, action, parameters, horizon)
+  decision       String   // JSON string representing decision inputs
   baseline       String   // JSON string representing the "Current Path" outcome
   scenarios      String   // JSON string of generated alternative scenarios
   assumptions    String   // JSON string of explicit transparency rules/assumptions
@@ -263,4 +315,32 @@ model DecisionSimulation {
 
   @@index([userId])
   @@map("DecisionSimulations")
+}
+
+model ChatConversation {
+  id        String        @id @default(uuid())
+  userId    String
+  title     String        @default("New Conversation")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@index([userId])
+  @@map("ChatConversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  role           String   // 'user' or 'assistant'
+  content        String
+  mode           String?  // 'LLM', 'Deterministic', etc.
+  createdAt      DateTime @default(now())
+
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("ChatMessages")
 }
