@@ -15,6 +15,7 @@ async function main() {
   console.log('Seeding database...');
 
   // Clear existing records in reverse dependency order
+  await prisma.fitnessActivity.deleteMany();
   await prisma.chatMessage.deleteMany();
   await prisma.chatConversation.deleteMany();
   await prisma.goal.deleteMany();
@@ -774,6 +775,50 @@ async function main() {
     ],
   });
   console.log('Seeded chat conversation.');
+
+  // ==========================================
+  // SEED FITNESS ACTIVITIES
+  // ==========================================
+  await prisma.fitnessActivity.createMany({
+    data: [
+      {
+        userId: demoUser.id,
+        activityType: 'Running',
+        duration: 30,
+        caloriesBurned: 350.0,
+        activityDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // yesterday
+      },
+      {
+        userId: demoUser.id,
+        activityType: 'Gym',
+        duration: 60,
+        caloriesBurned: 450.0,
+        activityDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: demoUser.id,
+        activityType: 'Cycling',
+        duration: 45,
+        caloriesBurned: 300.0,
+        activityDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: demoUser.id,
+        activityType: 'Running',
+        duration: 25,
+        caloriesBurned: 280.0,
+        activityDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      },
+      {
+        userId: demoUser.id,
+        activityType: 'Gym',
+        duration: 75,
+        caloriesBurned: 550.0,
+        activityDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      },
+    ],
+  });
+  console.log('Seeded fitness activities.');
 
   console.log('\n✅ Database seeded successfully!');
   console.log('\n📋 Demo Credentials:');

@@ -70,6 +70,13 @@ import {
   deleteGenericGoal,
 } from '../controllers/genericGoalController';
 import { getRecommendationsV2 } from '../controllers/recommendationController';
+import {
+  addFitnessActivity,
+  getFitnessActivities,
+  updateFitnessActivity,
+  deleteFitnessActivity,
+  getFitnessStats
+} from '../controllers/fitnessController';
 
 const router = Router();
 
@@ -150,6 +157,13 @@ router.post('/habits', authenticateToken as any, addHabit);
 router.get('/habits', authenticateToken as any, getHabits);
 router.put('/habits/:id', authenticateToken as any, updateHabit);
 router.delete('/habits/:id', authenticateToken as any, deleteHabit);
+
+// --- Fitness Activities (Protected) ---
+router.post('/fitness', authenticateToken as any, addFitnessActivity);
+router.get('/fitness', authenticateToken as any, getFitnessActivities);
+router.put('/fitness/:id', authenticateToken as any, updateFitnessActivity);
+router.delete('/fitness/:id', authenticateToken as any, deleteFitnessActivity);
+router.get('/fitness/stats', authenticateToken as any, getFitnessStats);
 
 // --- Activity (Protected) ---
 router.get('/activity', authenticateToken as any, getActivityHistory);

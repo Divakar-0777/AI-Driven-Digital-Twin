@@ -70,29 +70,56 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
     study_hours = sum([s.duration for s in payload.sessions]) / 60.0
     avg_study_rating = sum([s.productivityRating for s in payload.sessions]) / len(payload.sessions) if payload.sessions else 0.0
     
+    # Build context prompt
+    context = f"""
+    You are Antigravity, the AI Personal Productivity and Financial Digital Twin assistant.
+    You are assisting a user. Here is the user's real, calculated backend data:
+    - Monthly Income: ${payload.monthlyIncome:.2f}
+    - General Monthly Expense Target: ${payload.monthlyExpenseTarget:.2f}
+    - Total Logged Income: ${total_income:.2f}
+    - Total Logged Expenses: ${total_expense:.2f}
+    - Net Current Savings: ${net_savings:.2f}
+    - Largest Expense Category: '{largest_category}' (Spent ${largest_amount:.2f})
+    - Category Budgets: {json.dumps([{'category': b.category, 'limit': b.monthlyLimit, 'spent': b.currentSpending} for b in payload.budgets])}
+    - Savings Goals: {json.dumps([{'name': g.goalName, 'target': g.targetAmount, 'current': g.currentAmount} for g in payload.goals])}
+    - Study hours logged: {study_hours:.2f} hrs (Avg rating: {avg_study_rating:.1f}/5, target: {payload.dailyStudyHoursTarget} hrs/day)
+    
+    RULES:
+    1. ONLY use the figures provided above. Do NOT hallucinate or calculate custom sums that differ from these facts.
+    2. Be direct, natural, and helpful. Focus on actionable trade-offs and digital twin concepts (how money affects studying/habits).
+    """
+
+    # Check for OpenAI API key
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            url = "https://api.openai.com/v1/chat/completions"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {openai_key}"
+            }
+            body = {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": context},
+                    {"role": "user", "content": req.query}
+                ],
+                "temperature": 0.5
+            }
+            response = requests.post(url, headers=headers, json=body)
+            if response.status_code == 200:
+                res_data = response.json()
+                text_reply = res_data['choices'][0]['message']['content']
+                return {"reply": text_reply, "mode": "OpenAI (GPT-4o-mini)"}
+            else:
+                print(f"OpenAI API error: Status {response.status_code}, {response.text}")
+        except Exception as e:
+            print("OpenAI API call failed, falling back:", e)
+
     # Check for Gemini API key
     gemini_key = os.getenv("GEMINI_API_KEY")
     if gemini_key:
         try:
-            # Build context prompt
-            context = f"""
-            You are Antigravity, the AI Personal Productivity and Financial Digital Twin assistant.
-            You are assisting a user. Here is the user's real, calculated backend data:
-            - Monthly Income: ${payload.monthlyIncome:.2f}
-            - General Monthly Expense Target: ${payload.monthlyExpenseTarget:.2f}
-            - Total Logged Income: ${total_income:.2f}
-            - Total Logged Expenses: ${total_expense:.2f}
-            - Net Current Savings: ${net_savings:.2f}
-            - Largest Expense Category: '{largest_category}' (Spent ${largest_amount:.2f})
-            - Category Budgets: {json.dumps([{'category': b.category, 'limit': b.monthlyLimit, 'spent': b.currentSpending} for b in payload.budgets])}
-            - Savings Goals: {json.dumps([{'name': g.goalName, 'target': g.targetAmount, 'current': g.currentAmount} for g in payload.goals])}
-            - Study hours logged: {study_hours:.2f} hrs (Avg rating: {avg_study_rating:.1f}/5, target: {payload.dailyStudyHoursTarget} hrs/day)
-            
-            RULES:
-            1. ONLY use the figures provided above. Do NOT hallucinate or calculate custom sums that differ from these facts.
-            2. Be direct, natural, and helpful. Focus on actionable trade-offs and digital twin concepts (how money affects studying/habits).
-            """
-            
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             body = {
@@ -103,12 +130,11 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
                     }
                 ]
             }
-            
             response = requests.post(url, headers=headers, json=body)
             if response.status_code == 200:
                 res_data = response.json()
                 text_reply = res_data['candidates'][0]['content']['parts'][0]['text']
-                return {"reply": text_reply, "mode": "LLM"}
+                return {"reply": text_reply, "mode": "Gemini (1.5 Flash)"}
         except Exception as e:
             print("Gemini API call failed, falling back to rule-based parser:", e)
 

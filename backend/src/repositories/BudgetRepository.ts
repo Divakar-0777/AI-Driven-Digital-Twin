@@ -1,5 +1,13 @@
 import prisma from '../database/prismaClient';
 
+export interface BudgetInput {
+  category: string;
+  monthlyLimit: number;
+  period?: string;
+  status?: string;
+  currentSpending?: number;
+}
+
 export class BudgetRepository {
   private static serializeBudget(budget: any) {
     return {
@@ -26,17 +34,26 @@ export class BudgetRepository {
     return budget ? this.serializeBudget(budget) : null;
   }
 
-  static async createBudget(data: {
-    userId: string;
-    category: string;
-    monthlyLimit: number;
-  }) {
+  static async findByUserAndCategory(userId: string, category: string) {
+    const budget = await prisma.budget.findFirst({
+      where: {
+        userId,
+        category: { equals: category, mode: 'insensitive' },
+      },
+    });
+
+    return budget ? this.serializeBudget(budget) : null;
+  }
+
+  static async createBudget(userId: string, data: BudgetInput) {
     const budget = await prisma.budget.create({
       data: {
-        userId: data.userId,
+        userId,
         category: data.category,
         monthlyLimit: data.monthlyLimit,
-        currentSpending: 0,
+        currentSpending: data.currentSpending ?? 0,
+        period: data.period || 'MONTHLY',
+        status: data.status || 'ACTIVE',
       },
     });
 
@@ -49,6 +66,8 @@ export class BudgetRepository {
       category?: string;
       monthlyLimit?: number;
       currentSpending?: number;
+      period?: string;
+      status?: string;
     }
   ) {
     const budget = await prisma.budget.update({

@@ -1,4 +1,5 @@
 import React from 'react';
+// @ts-ignore
 import Plot from 'react-plotly.js';
 
 export interface PlotlyChartProps {
@@ -10,7 +11,7 @@ export interface PlotlyChartProps {
   style?: React.CSSProperties;
 }
 
-const defaultLayout: Partial<Plotly.Layout> = {
+const defaultLayout: any = {
   autosize: true,
   margin: { l: 50, r: 20, t: 30, b: 50 },
   paper_bgcolor: 'transparent',
@@ -40,7 +41,7 @@ const defaultLayout: Partial<Plotly.Layout> = {
   },
 };
 
-const defaultConfig: Partial<Plotly.Config> = {
+const defaultConfig: any = {
   displayModeBar: true,
   modeBarButtonsToAdd: ['zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
   modeBarButtonsToRemove: ['lasso2d', 'select2d', 'toImage'],

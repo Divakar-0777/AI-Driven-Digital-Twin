@@ -30,6 +30,7 @@ model User {
   financialSimulations FinancialSimulation[]
   decisionSimulations  DecisionSimulation[]
   chatConversations    ChatConversation[]
+  fitnessActivities    FitnessActivity[]
 
   @@map("Users")
 }
@@ -126,6 +127,7 @@ model DigitalTwinState {
   habitScore           Float    @default(0.0)
   studyScore           Float    @default(0.0)
   goalScore            Float    @default(0.0)
+  fitnessScore         Float    @default(0.0)
   overallScore         Float    @default(0.0)
   twinEmoticon         String   @default("😐")
   twinStatus           String   @default("Initializing")
@@ -210,6 +212,7 @@ model AnalyticsSummary {
   habitScore           Float    @default(0.0)
   studyScore           Float    @default(0.0)
   goalScore            Float    @default(0.0)
+  fitnessScore         Float    @default(0.0)
   overallAIScore       Float    @default(0.0)
   updatedAt            DateTime @updatedAt
 
@@ -343,4 +346,19 @@ model ChatMessage {
 
   @@index([conversationId])
   @@map("ChatMessages")
+}
+
+model FitnessActivity {
+  id             String   @id @default(uuid())
+  userId         String
+  activityType   String   // e.g. 'Running', 'Gym', 'Cycling', 'Swimming', etc.
+  duration       Int      // in minutes
+  caloriesBurned Float
+  activityDate   DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, activityDate])
+  @@map("FitnessActivities")
 }

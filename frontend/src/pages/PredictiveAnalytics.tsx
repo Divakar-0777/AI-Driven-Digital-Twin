@@ -50,16 +50,6 @@ interface PredictionHistoryLog {
   createdAt: string;
 }
 
-interface Simulation {
-  id?: string;
-  scenarioName: string;
-  projectedIncome: number;
-  projectedExpenses: number;
-  projectedSavings: number;
-  projectedBalance: number;
-  riskLevel: 'LOW' | 'MODERATE' | 'HIGH';
-  goalImpact?: any[];
-}
 
 export const PredictiveAnalytics: React.FC = () => {
   const [scores, setScores] = useState<ScoreCard>({
@@ -253,7 +243,6 @@ export const PredictiveAnalytics: React.FC = () => {
     { name: 'Net Savings', amount: finance?.monthly_savings_prediction || 0, fill: '#6366f1' }
   ];
 
-  const baselineMonthlySavings = finance?.monthly_savings_prediction || 1000.0;
 
   const renderComparisonChart = () => {
     if (!activeDecisionSim || !activeDecisionSim.outcomes) return null;
@@ -274,10 +263,10 @@ export const PredictiveAnalytics: React.FC = () => {
       <div style={{ height: '240px', marginTop: '20px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="month" stroke="#64748b" fontSize={10} />
-            <YAxis stroke="#64748b" fontSize={10} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
-            <Tooltip contentStyle={{ background: '#1e1b4b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }} formatter={(v: any) => `₹${v.toLocaleString()}`} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.12)" />
+            <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} />
+            <YAxis stroke="#94a3b8" fontSize={10} tickFormatter={(v) => `₹${v.toLocaleString()}`} />
+            <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '8px', color: 'white' }} formatter={(v: any) => `₹${v.toLocaleString()}`} />
             <Legend wrapperStyle={{ fontSize: '10px' }} />
             {activeDecisionSim.outcomes.map((o: any, idx: number) => (
               <Line
@@ -380,22 +369,22 @@ export const PredictiveAnalytics: React.FC = () => {
 
         {/* Goal predictions block */}
         {goalPredictions.length > 0 && (
-          <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.2)', marginBottom: '32px' }}>
+          <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)', marginBottom: '32px' }}>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '16px' }}>Savings Goal Timeline Projections</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
               {goalPredictions.map((gp: any, idx: number) => (
-                <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px' }}>
+                <div key={idx} style={{ padding: '16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{gp.goalName}</span>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: gp.status === 'ON_TRACK' ? '#10b981' : '#f87171' }}>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem' }}>{gp.goalName}</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: gp.status === 'ON_TRACK' ? '#10b981' : '#f87171' }}>
                       {gp.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: '#cbd5e1', margin: '4px 0' }}>
-                    Est. Completion: **{gp.estimatedCompletionDate}** ({gp.estimatedMonths} months)
+                  <p style={{ fontSize: '0.85rem', color: '#f8fafc', margin: '4px 0' }}>
+                    Est. Completion: <strong>{gp.estimatedCompletionDate}</strong> ({gp.estimatedMonths} months)
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>
-                    Required monthly contribution: **${gp.requiredMonthlyContribution.toFixed(2)}**
+                  <p style={{ fontSize: '0.85rem', color: '#cbd5e1', margin: 0 }}>
+                    Required monthly contribution: <strong>${gp.requiredMonthlyContribution.toFixed(2)}</strong>
                   </p>
                 </div>
               ))}
@@ -408,10 +397,10 @@ export const PredictiveAnalytics: React.FC = () => {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {/* Expense Forecast Chart */}
-            <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.2)' }}>
+            <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Expense Forecast (Next 30 Days)</h3>
-                <span style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
+                <span style={{ fontSize: '0.85rem', padding: '4px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.25)', color: '#a5b4fc', fontWeight: 600 }}>
                   Model: {finance?.model_type || 'Regressor'}
                 </span>
               </div>
@@ -421,28 +410,28 @@ export const PredictiveAnalytics: React.FC = () => {
                     <AreaChart data={expenseChartData}>
                       <defs>
                         <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.45}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.05}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `$${v}`} />
-                      <Tooltip contentStyle={{ background: '#1e1b4b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }} />
-                      <Area type="monotone" dataKey="amount" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorExpense)" name="Forecasted Spend" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.12)" />
+                      <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `$${v}`} />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '8px', color: 'white' }} />
+                      <Area type="monotone" dataKey="amount" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" name="Forecasted Spend" />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>No forecast data available</div>
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No forecast data available</div>
                 )}
               </div>
             </div>
 
             {/* Study Hours Forecast Chart */}
-            <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.2)' }}>
+            <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Study Hours Time-Series Forecast</h3>
-                <span style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
+                <span style={{ fontSize: '0.85rem', padding: '4px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.25)', color: '#a5b4fc', fontWeight: 600 }}>
                   Model: {study?.model_type || 'Prophet/Regressor'}
                 </span>
               </div>
@@ -452,40 +441,40 @@ export const PredictiveAnalytics: React.FC = () => {
                     <AreaChart data={studyChartData}>
                       <defs>
                         <linearGradient id="colorStudy" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.45}/>
+                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0.05}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `${v}h`} />
-                      <Tooltip contentStyle={{ background: '#1e1b4b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }} />
-                      <Area type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorStudy)" name="Study Forecast" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.12)" />
+                      <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${v}h`} />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '8px', color: 'white' }} />
+                      <Area type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorStudy)" name="Study Forecast" />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>No study forecast available</div>
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No study forecast available</div>
                 )}
               </div>
             </div>
 
             {/* Habits Completion Probabilities */}
-            <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.2)' }}>
+            <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '20px' }}>Habit Completion Probabilities (Tomorrow)</h3>
               <div style={{ height: '240px' }}>
                 {habitChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={habitChartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `${v}%`} />
-                      <Tooltip contentStyle={{ background: '#1e1b4b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.12)" />
+                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${v}%`} />
+                      <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '8px', color: 'white' }} />
                       <Bar dataKey="probability" fill="#ec4899" radius={[6, 6, 0, 0]} name="Completion Probability (%)" />
                       <Bar dataKey="completion" fill="#10b981" radius={[6, 6, 0, 0]} name="Historical Completion (%)" />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>No habits data available</div>
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No habits data available</div>
                 )}
               </div>
             </div>
@@ -550,7 +539,7 @@ export const PredictiveAnalytics: React.FC = () => {
             </div>
 
             {/* AI Advisor Panel */}
-            <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.3)' }}>
+            <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
                 <Brain style={{ color: '#c084fc' }} size={22} />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>AI Recommendations</h3>
@@ -562,47 +551,47 @@ export const PredictiveAnalytics: React.FC = () => {
                     <div
                       key={idx}
                       style={{
-                        padding: '14px 18px',
+                        padding: '16px 20px',
                         borderRadius: '10px',
-                        background: 'rgba(255,255,255,0.02)',
+                        background: 'rgba(255,255,255,0.05)',
                         borderLeft: `4px solid ${
                           rec.category === 'FINANCE' ? '#ef4444' : rec.category === 'STUDY' ? '#6366f1' : '#ec4899'
                         }`,
-                        fontSize: '0.85rem',
-                        lineHeight: '1.4'
+                        fontSize: '0.95rem',
+                        lineHeight: '1.5'
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <span style={{ fontWeight: 700, fontSize: '0.75rem', color: '#94a3b8' }}>{rec.category}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#e2e8f0' }}>{rec.category}</span>
                         <span style={{
                           fontWeight: 700,
-                          fontSize: '0.65rem',
-                          padding: '2px 6px',
+                          fontSize: '0.75rem',
+                          padding: '3px 8px',
                           borderRadius: '4px',
-                          background: rec.impactLevel === 'HIGH' ? 'rgba(239,68,68,0.15)' : 'rgba(236,72,153,0.1)',
-                          color: rec.impactLevel === 'HIGH' ? '#f87171' : '#f472b6'
+                          background: rec.impactLevel === 'HIGH' ? 'rgba(239,68,68,0.2)' : 'rgba(236,72,153,0.15)',
+                          color: rec.impactLevel === 'HIGH' ? '#fca5a5' : '#ff9ecf'
                         }}>
                           {rec.impactLevel}
                         </span>
                       </div>
-                      <p style={{ color: '#cbd5e1', margin: 0 }}>{rec.recommendationText}</p>
+                      <p style={{ color: '#f8fafc', margin: 0, fontSize: '0.95rem' }}>{rec.recommendationText}</p>
                     </div>
                   ))
                 ) : (
-                  <div style={{ color: '#64748b', fontSize: '0.85rem', textAlign: 'center' }}>No current recommendations</div>
+                  <div style={{ color: '#94a3b8', fontSize: '0.95rem', textAlign: 'center' }}>No current recommendations</div>
                 )}
               </div>
             </div>
 
             {/* Savings Capacity / Financial Forecast Indicators */}
-            <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.3)' }}>
+            <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '20px' }}>Monthly Savings Forecast</h3>
               <div style={{ height: '180px', marginBottom: '16px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={savingsChartData}>
-                    <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                    <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `$${v}`} />
-                    <Tooltip contentStyle={{ background: '#1e1b4b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'white' }} />
+                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `$${v}`} />
+                    <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '8px', color: 'white' }} />
                     <Bar dataKey="amount" fill="#6366f1" radius={[6, 6, 0, 0]} name="Amount ($)">
                       {savingsChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -611,7 +600,7 @@ export const PredictiveAnalytics: React.FC = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.8rem', color: '#cbd5e1' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.9rem', color: '#f1f5f9' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Overspending Risk:</span>
                   <span style={{ fontWeight: 700, color: (finance?.overspending_probability || 0) > 50 ? '#ef4444' : '#10b981' }}>
@@ -630,11 +619,11 @@ export const PredictiveAnalytics: React.FC = () => {
         </div>
 
         {/* Future Scenario Simulation Section */}
-        <div className="glass-panel" style={{ padding: '32px', background: 'rgba(30, 27, 75, 0.2)', marginBottom: '40px' }}>
+        <div className="glass-panel" style={{ padding: '32px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)', marginBottom: '40px' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Sparkles size={20} style={{ color: 'var(--primary)' }} /> Future Scenario Simulation
           </h3>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '24px' }}>
+          <p style={{ color: '#cbd5e1', fontSize: '0.9rem', marginBottom: '24px' }}>
             Choose a decision template, enter its parameters, specify time horizons, adjust priorities, and inspect simulated outcome scenarios side-by-side.
           </p>
 
@@ -779,34 +768,34 @@ export const PredictiveAnalytics: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                   
                   {/* Step 7: Personalized Recommendation Panel */}
-                  <div className="glass-panel" style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
+                  <div className="glass-panel" style={{ padding: '24px', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%)', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: '1px' }}>AI Advisor Recommendation</span>
-                      <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontWeight: 700 }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: '1px' }}>AI Advisor Recommendation</span>
+                      <span style={{ fontSize: '0.85rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', fontWeight: 700 }}>
                         RECOMMENDED
                       </span>
                     </div>
                     
-                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', marginBottom: '8px' }}>
+                    <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'white', marginBottom: '8px' }}>
                       {activeDecisionSim.recommendation.recommended_scenario_name}
                     </h4>
                     
-                    <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.4', marginBottom: '14px' }}>
+                    <p style={{ fontSize: '0.95rem', color: '#f8fafc', lineHeight: '1.5', marginBottom: '14px' }}>
                       {activeDecisionSim.recommendation.why_selected}
                     </p>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
                       <div>
-                        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Key Benefits:</span>
-                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Key Benefits:</span>
+                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.85rem', color: '#cbd5e1' }}>
                           {activeDecisionSim.recommendation.main_benefits.map((b: string, i: number) => (
                             <li key={i}>{b}</li>
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <span style={{ fontSize: '0.75rem', color: '#fca5a5', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Key Risks:</span>
-                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#fca5a5', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Key Risks:</span>
+                        <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.85rem', color: '#cbd5e1' }}>
                           {activeDecisionSim.recommendation.main_risks.map((r: string, i: number) => (
                             <li key={i}>{r}</li>
                           ))}
@@ -814,11 +803,11 @@ export const PredictiveAnalytics: React.FC = () => {
                       </div>
                     </div>
 
-                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 10px 0' }}>
+                    <p style={{ fontSize: '0.85rem', color: '#cbd5e1', margin: '0 0 10px 0' }}>
                       <strong>Trade-offs:</strong> {activeDecisionSim.recommendation.trade_offs}
                     </p>
 
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '10px', fontSize: '0.75rem' }}>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '10px', fontSize: '0.85rem' }}>
                       <div style={{ color: '#fbbf24', marginBottom: '4px' }}>
                         <strong>Alternative Choice:</strong> {activeDecisionSim.recommendation.alternative_option}
                       </div>
@@ -987,16 +976,16 @@ export const PredictiveAnalytics: React.FC = () => {
         </div>
 
         {/* Prediction History Table */}
-        <div className="glass-panel" style={{ padding: '28px', background: 'rgba(30, 27, 75, 0.2)' }}>
+        <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', border: '1px solid rgba(99, 102, 241, 0.35)', boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
             <Activity style={{ color: '#6366f1' }} size={22} />
             <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Prediction History & Execution Log</h3>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8' }}>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: '#cbd5e1' }}>
                   <th style={{ padding: '12px 16px', fontWeight: 600 }}>Date Logged</th>
                   <th style={{ padding: '12px 16px', fontWeight: 600 }}>Model Segment</th>
                   <th style={{ padding: '12px 16px', fontWeight: 600 }}>Confidence Index</th>
@@ -1008,16 +997,16 @@ export const PredictiveAnalytics: React.FC = () => {
                   predictionHistory.map((log) => (
                     <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', color: '#cbd5e1' }}>
                       <td style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={14} style={{ color: '#64748b' }} />
+                        <Calendar size={14} style={{ color: '#94a3b8' }} />
                         {new Date(log.createdAt).toLocaleString()}
                       </td>
                       <td style={{ padding: '12px 16px' }}>
                         <span style={{
                           fontWeight: 700,
-                          fontSize: '0.75rem',
-                          padding: '2px 8px',
+                          fontSize: '0.85rem',
+                          padding: '4px 10px',
                           borderRadius: '4px',
-                          background: log.predictionType === 'FINANCE' ? 'rgba(16,185,129,0.1)' : log.predictionType === 'STUDY' ? 'rgba(99,102,241,0.1)' : 'rgba(236,72,153,0.1)',
+                          background: log.predictionType === 'FINANCE' ? 'rgba(16,185,129,0.15)' : log.predictionType === 'STUDY' ? 'rgba(99,102,241,0.15)' : 'rgba(236,72,153,0.15)',
                           color: log.predictionType === 'FINANCE' ? '#10b981' : log.predictionType === 'STUDY' ? '#818cf8' : '#f472b6'
                         }}>
                           {log.predictionType}
@@ -1026,7 +1015,7 @@ export const PredictiveAnalytics: React.FC = () => {
                       <td style={{ padding: '12px 16px', fontWeight: 700 }}>
                         {(log.confidenceScore * 100).toFixed(0)}%
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#94a3b8' }}>
+                      <td style={{ padding: '12px 16px', color: '#f1f5f9' }}>
                         {log.predictionType === 'FINANCE'
                           ? `Monthly Spend: $${log.predictionResult.monthly_expense_prediction}. Overspend risk: ${log.predictionResult.overspending_probability}%.`
                           : log.predictionType === 'STUDY'

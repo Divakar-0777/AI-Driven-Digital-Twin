@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { Send, Bot, User, Loader2, MessageSquare, Trash2, Plus } from 'lucide-react';
+import { Send, Bot, User, Loader2, Trash2, Plus } from 'lucide-react';
 
 interface Message {
   id?: string;

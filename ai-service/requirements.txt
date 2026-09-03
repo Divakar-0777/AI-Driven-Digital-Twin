@@ -11,3 +11,4 @@ pyjwt
 python-multipart
 python-dotenv
 requests
+plotly

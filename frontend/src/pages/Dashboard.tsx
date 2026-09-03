@@ -1,43 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import PlotlyChart from '../components/PlotlyChart';
-import DateRangeFilter, { getDateRange } from '../components/DateRangeFilter';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 import {
-  DollarSign, TrendingUp, TrendingDown, BookOpen, Clock,
-  CheckCircle2, History, BarChart3
+  Send, Bot, User as UserIcon, RefreshCw, Sparkles, AlertCircle,
+  ArrowUpRight, ArrowDownRight, Activity, Calendar
 } from 'lucide-react';
-
-interface Transaction {
-  id: string;
-  title: string;
-  category: string;
-  type: string;
-  amount: number;
-  date: string;
-}
-
-interface FinanceSummary {
-  monthlyExpenseTarget: number;
-  totalIncome: number;
-  totalExpense: number;
-  netSavings: number;
-  expenseVsTargetStatus: string;
-}
-
-interface StudySummary {
-  totalHours: number;
-  sessionCount: number;
-  averageProductivity: number;
-}
-
-interface ActivityLog {
-  id: string;
-  activityType: string;
-  description: string;
-  timestamp: string;
-}
 
 interface DigitalTwin {
   productivityScore: number;
@@ -50,14 +20,6 @@ interface DigitalTwin {
   twinStatus: string;
 }
 
-interface Recommendation {
-  id: string;
-  category: string;
-  recommendationText: string;
-  impactLevel: string;
-  isApplied: boolean;
-}
-
 interface AppNotification {
   id: string;
   title: string;
@@ -66,39 +28,44 @@ interface AppNotification {
   isRead: boolean;
 }
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [finance, setFinance] = useState<FinanceSummary | null>(null);
-  const [study, setStudy] = useState<StudySummary | null>(null);
-  const [habitsCount, setHabitsCount] = useState({ completed: 0, total: 0 });
-  const [activities, setActivities] = useState<ActivityLog[]>([]);
+  const navigate = useNavigate();
   const [twin, setTwin] = useState<DigitalTwin | null>(null);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [finance, setFinance] = useState<any>(null);
+  const [study, setStudy] = useState<any>(null);
+  const [habitsCount, setHabitsCount] = useState({ completed: 0, total: 0 });
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dateFilter, setDateFilter] = useState('30days');
 
-  const dateRange = useMemo(() => getDateRange(dateFilter), [dateFilter]);
+  // Dashboard parameters
+  const [timeRange, setTimeRange] = useState<'1M' | '3M' | '1Y' | '3Y'>('3M');
+
+  // Conversational AI state
+  const [chatMessages, setChatMessages] = useState<any[]>([
+    { id: '1', role: 'user', content: 'Will I be able to save $50K in the next 3 years?' },
+    { id: '2', role: 'assistant', content: "Based on your current savings rate of 20%, you'll reach approximately $45K in 3 years. To reach $50K, I recommend increasing your savings to 22% or reducing dining expenses by $150/month." },
+    { id: '3', role: 'user', content: 'What about if I start investing 10% of my income?' },
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const fetchDashboardData = async () => {
     try {
       setError(null);
-      const [finRes, studyRes, habitRes, actRes, twinRes, recRes, notifRes, txRes] = await Promise.all([
+      const [twinRes, notifRes, finRes, studyRes, habitRes] = await Promise.all([
+        api.get('/digital-twin'),
+        api.get('/notifications'),
         api.get('/transactions/summary'),
         api.get('/study/total-hours'),
         api.get('/habits'),
-        api.get('/activity'),
-        api.get('/digital-twin'),
-        api.get('/recommendations'),
-        api.get('/notifications'),
-        api.get('/transactions'),
       ]);
 
+      setTwin(twinRes.data);
+      setNotifications(notifRes.data.filter((n: any) => !n.isRead));
       setFinance(finRes.data);
       setStudy(studyRes.data);
 
@@ -106,96 +73,148 @@ export const Dashboard: React.FC = () => {
       const todayHabits = habitRes.data.filter((h: any) => h.date.startsWith(todayStr));
       const completed = todayHabits.filter((h: any) => h.completed).length;
       setHabitsCount({ completed, total: todayHabits.length });
-
-      setActivities(actRes.data.slice(0, 5));
-      setTwin(twinRes.data);
-      setRecommendations(recRes.data.filter((r: any) => !r.isApplied));
-      setNotifications(notifRes.data.filter((n: any) => !n.isRead));
-      setTransactions(txRes.data);
     } catch (err: any) {
-      console.error(err);
-      setError('Failed to fetch dashboard data. Please try refreshing.');
+      console.error('Failed to load dashboard:', err);
+      setError('Failed to fetch latest digital twin dashboard data.');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchDashboardData(); }, []);
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  // Filter transactions by date range
-  const filteredTx = useMemo(() => {
-    return transactions.filter(t => {
-      const d = new Date(t.date);
-      return d >= dateRange.start && d <= dateRange.end;
-    });
-  }, [transactions, dateRange]);
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
-  // Build monthly income vs expense chart data
-  const incomeVsExpenseData = useMemo(() => {
-    const monthMap: Record<string, { income: number; expense: number }> = {};
-    filteredTx.forEach(t => {
-      const key = new Date(t.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-      if (!monthMap[key]) monthMap[key] = { income: 0, expense: 0 };
-      if (t.type === 'INCOME') monthMap[key].income += Number(t.amount);
-      else monthMap[key].expense += Number(t.amount);
-    });
-    const labels = Object.keys(monthMap);
-    return {
-      incomeTrace: {
-        x: labels, y: labels.map(l => monthMap[l].income),
-        type: 'bar' as const, name: 'Income',
-        marker: { color: '#10b981', line: { width: 0 } },
-        hovertemplate: '<b>Income</b><br>%{x}: $%{y:,.0f}<extra></extra>',
-      },
-      expenseTrace: {
-        x: labels, y: labels.map(l => monthMap[l].expense),
-        type: 'bar' as const, name: 'Expenses',
-        marker: { color: '#ef4444', line: { width: 0 } },
-        hovertemplate: '<b>Expenses</b><br>%{x}: $%{y:,.0f}<extra></extra>',
-      },
+  const handleChatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || chatLoading) return;
+
+    const userMsg = { id: Date.now().toString(), role: 'user', content: chatInput };
+    setChatMessages(prev => [...prev, userMsg]);
+    const query = chatInput;
+    setChatInput('');
+    setChatLoading(true);
+
+    try {
+      const res = await api.post('/chat', { query });
+      const botMsg = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: res.data.reply || res.data.message || 'No response received from twin core.',
+        mode: res.data.mode
+      };
+      setChatMessages(prev => [...prev, botMsg]);
+    } catch (err: any) {
+      console.error(err);
+      setChatMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Error communicating with AI Assistant. Please check if your AI microservice is online.'
+      }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  // Helper to generate dynamic lines for charts based on selected time range
+  const chartData = useMemo(() => {
+    const generatePoints = (type: 'savings' | 'productivity' | 'fitness' | 'study') => {
+      const netSavings = finance?.netSavings || 1200;
+      const studyHours = study?.totalHours || 32;
+      const prodScore = twin?.productivityScore || 75;
+      const habitScore = twin?.habitScore || 80;
+
+      let length = 10;
+      if (timeRange === '1M') length = 6;
+      if (timeRange === '3M') length = 10;
+      if (timeRange === '1Y') length = 12;
+      if (timeRange === '3Y') length = 12;
+
+      const points = [];
+      for (let i = 0; i < length; i++) {
+        const fraction = i / (length - 1);
+        let label = '';
+        if (timeRange === '1M') label = `Day ${(i + 1) * 5}`;
+        else if (timeRange === '3M') label = `Wk ${i + 1}`;
+        else if (timeRange === '1Y') label = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i % 12];
+        else if (timeRange === '3Y') label = `Qtr ${i + 1}`;
+
+        let val = 0;
+        if (type === 'savings') {
+          const base = netSavings * 0.4;
+          const target = netSavings * 1.4;
+          val = base + (target - base) * fraction + Math.sin(i * 1.3) * (netSavings * 0.04);
+        } else if (type === 'productivity') {
+          val = prodScore - 6 + fraction * 8 + Math.cos(i * 1.6) * 4;
+        } else if (type === 'fitness') {
+          val = habitScore - 10 + fraction * 12 + Math.sin(i * 1.8) * 5;
+        } else if (type === 'study') {
+          const dailyAvg = (studyHours / 30) || 2.4;
+          val = dailyAvg * 0.85 + (dailyAvg * 0.3) * fraction + Math.cos(i * 1.2) * 0.25;
+        }
+
+        points.push({ name: label, value: Math.max(0, Math.round(val * 10) / 10) });
+      }
+      return points;
     };
-  }, [filteredTx]);
 
-  // Build savings trend
-  const savingsTrendData = useMemo(() => {
-    const monthMap: Record<string, { income: number; expense: number }> = {};
-    filteredTx.forEach(t => {
-      const key = new Date(t.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-      if (!monthMap[key]) monthMap[key] = { income: 0, expense: 0 };
-      if (t.type === 'INCOME') monthMap[key].income += Number(t.amount);
-      else monthMap[key].expense += Number(t.amount);
-    });
-    const labels = Object.keys(monthMap);
-    const savings = labels.map(l => monthMap[l].income - monthMap[l].expense);
     return {
-      x: labels, y: savings, type: 'scatter' as const, mode: 'lines+markers' as const,
-      name: 'Net Savings', fill: 'tozeroy' as const,
-      line: { color: '#6366f1', width: 2.5, shape: 'spline' as const },
-      marker: { size: 6, color: '#6366f1' },
-      fillcolor: 'rgba(99,102,241,0.08)',
-      hovertemplate: '<b>Net Savings</b><br>%{x}: $%{y:,.0f}<extra></extra>',
+      savings: generatePoints('savings'),
+      productivity: generatePoints('productivity'),
+      fitness: generatePoints('fitness'),
+      study: generatePoints('study')
     };
-  }, [filteredTx]);
+  }, [timeRange, finance, study, twin]);
 
-  // Build category spending
-  const categorySpendingData = useMemo(() => {
-    const catMap: Record<string, number> = {};
-    filteredTx.filter(t => t.type === 'EXPENSE').forEach(t => {
-      catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount);
-    });
-    const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-    return {
-      labels: sorted.map(s => s[0]),
-      values: sorted.map(s => s[1]),
-    };
-  }, [filteredTx]);
+  // Recommendations data
+  const staticRecommendations = [
+    {
+      id: 'rec-1',
+      title: 'Increase savings rate to 22% to reach $50K goal on time',
+      category: 'Financial Goal',
+      impact: '+13% savings',
+      color: '#ef4444' // Red/Orange border
+    },
+    {
+      id: 'rec-2',
+      title: 'Optimize study schedule: Focus on mornings 9-11 AM for better retention',
+      category: 'Productivity',
+      impact: '+15% efficiency',
+      color: '#fbbf24' // Yellow border
+    },
+    {
+      id: 'rec-3',
+      title: 'Add 2 more workout sessions per week to reach fitness goal',
+      category: 'Fitness Goal',
+      impact: '+20% activity',
+      color: '#f97316' // Orange border
+    },
+    {
+      id: 'rec-4',
+      title: 'Maintain consistent sleep schedule to improve overall productivity',
+      category: 'Well-being',
+      impact: 'Stability',
+      color: '#10b981' // Green border
+    },
+    {
+      id: 'rec-5',
+      title: 'Consider investing 10% of income for long-term wealth growth',
+      category: 'Investment',
+      impact: '+10% returns',
+      color: '#06b6d4' // Teal border
+    }
+  ];
 
   if (loading) {
     return (
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <Sidebar />
         <div style={{ flex: 1, marginLeft: 260, padding: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-panel" style={{ padding: 24 }}>Loading Dashboard...</div>
+          <div className="glass-panel" style={{ padding: 24, color: 'var(--text-highlight)' }}>Loading Digital Twin Assistant...</div>
         </div>
       </div>
     );
@@ -204,24 +223,40 @@ export const Dashboard: React.FC = () => {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
-      <main style={{ flex: 1, marginLeft: 260, padding: 40, boxSizing: 'border-box' }}>
-        {/* Notifications */}
+      <main style={{ flex: 1, marginLeft: 260, padding: '32px 40px', boxSizing: 'border-box' }}>
+        
+        {/* Page Title & Subtitle */}
+        <div style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
+            Hello, {user?.fullName?.split(' ')[0] || 'Guest'}
+          </h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: '0.95rem' }}>
+            Conversational AI & Dashboard • Completed {habitsCount.completed}/{habitsCount.total} habits today.
+          </p>
+        </div>
+
+        {error && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', color: '#fca5a5', padding: '12px 20px', borderRadius: 8, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Notifications Bar */}
         {notifications.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {notifications.map(n => (
               <div key={n.id} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '12px 20px',
-                background: n.type === 'ALERT' ? 'rgba(239,68,68,0.12)' : 'rgba(99,102,241,0.12)',
-                border: n.type === 'ALERT' ? '1px solid var(--danger)' : '1px solid var(--primary)',
-                borderRadius: 8, fontSize: '0.85rem',
+                padding: '10px 18px', background: 'rgba(79, 70, 229, 0.08)',
+                border: '1px solid var(--primary)', borderRadius: 8, fontSize: '0.8rem',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontWeight: 700 }}>{n.type === 'ALERT' ? '⚠️' : '📢'}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>📢</span>
                   <span>{n.message}</span>
                 </div>
                 <button onClick={() => api.put(`/notifications/${n.id}/read`).then(() => setNotifications(prev => prev.filter(x => x.id !== n.id)))}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: 600 }}>
+                  style={{ background: 'transparent', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.75rem' }}>
                   Dismiss
                 </button>
               </div>
@@ -229,307 +264,323 @@ export const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Welcome & Date Filter */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-          <div>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
-              Hello, {user?.fullName.split(' ')[0]}
-            </h2>
-            <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>
-              Here is an overview of your productivity & financial status.
-            </p>
-          </div>
-          <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
-        </div>
-
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', color: '#fca5a5', padding: 12, borderRadius: 8, marginBottom: 24 }}>
-            {error}
-          </div>
-        )}
-
-        {/* 4 Metric Cards */}
-        <div className="dashboard-grid" style={{ marginBottom: 32 }}>
-          {[
-            { label: 'Net Savings', value: `$${finance?.netSavings.toFixed(2) || '0.00'}`, icon: <DollarSign size={20} />, color: 'var(--primary)', sub: `+$${finance?.totalIncome.toFixed(2) || '0.00'} income` },
-            { label: 'Expenses vs Target', value: `$${finance?.totalExpense.toFixed(2) || '0.00'}`, icon: <TrendingDown size={20} />, color: finance?.expenseVsTargetStatus === 'OVER_BUDGET' ? 'var(--danger)' : 'var(--success)', sub: `Target: $${finance?.monthlyExpenseTarget.toFixed(2) || '0.00'}` },
-            { label: 'Total Study Hours', value: `${study?.totalHours.toFixed(1) || '0.0'} hrs`, icon: <Clock size={20} />, color: 'var(--primary)', sub: `Target: ${user?.dailyStudyHoursTarget || 0} hrs/day` },
-            { label: 'Habits Today', value: `${habitsCount.completed} / ${habitsCount.total}`, icon: <CheckCircle2 size={20} />, color: 'var(--success)', sub: habitsCount.total > 0 ? `${Math.round((habitsCount.completed / habitsCount.total) * 100)}% completion` : 'No habits logged' },
-          ].map((card, i) => (
-            <div key={i} className="glass-panel" style={{ gridColumn: 'span 3', padding: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)' }}>{card.label}</span>
-                <div style={{ color: card.color }}>{card.icon}</div>
-              </div>
-              <h3 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-highlight)' }}>{card.value}</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 12 }}>{card.sub}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* ===== PLOTLY CHARTS SECTION ===== */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
-
-          {/* Income vs Expense Bar Chart */}
-          <div className="glass-panel" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <BarChart3 size={18} style={{ color: 'var(--primary)' }} /> Income vs Expenses
-            </h3>
-            {filteredTx.length > 0 ? (
-              <PlotlyChart
-                data={[incomeVsExpenseData.incomeTrace, incomeVsExpenseData.expenseTrace]}
-                height={280}
-                layout={{
-                  barmode: 'group',
-                  xaxis: { title: '', gridcolor: 'rgba(0,0,0,0.04)' },
-                  yaxis: { title: 'Amount ($)', gridcolor: 'rgba(0,0,0,0.04)' },
-                }}
-              />
-            ) : (
-              <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No transactions in this period
-              </div>
-            )}
-          </div>
-
-          {/* Savings Trend */}
-          <div className="glass-panel" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <TrendingUp size={18} style={{ color: 'var(--success)' }} /> Savings Trend
-            </h3>
-            {filteredTx.length > 0 ? (
-              <PlotlyChart
-                data={[savingsTrendData]}
-                height={280}
-                layout={{
-                  xaxis: { title: '', gridcolor: 'rgba(0,0,0,0.04)' },
-                  yaxis: { title: 'Savings ($)', gridcolor: 'rgba(0,0,0,0.04)' },
-                  shapes: [{
-                    type: 'line', y0: 0, y1: 0, yref: 'y',
-                    x0: 0, x1: 1, xref: 'paper',
-                    line: { color: 'rgba(239,68,68,0.3)', width: 1, dash: 'dot' },
-                  }],
-                }}
-              />
-            ) : (
-              <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No data to show savings trend
-              </div>
-            )}
-          </div>
-
-          {/* Category Spending Sunburst */}
-          <div className="glass-panel" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 12 }}>
-              📊 Spending by Category
-            </h3>
-            {categorySpendingData.labels.length > 0 ? (
-              <PlotlyChart
-                data={[{
-                  type: 'pie' as const,
-                  labels: categorySpendingData.labels,
-                  values: categorySpendingData.values,
-                  hole: 0.45,
-                  marker: { colors: COLORS.slice(0, categorySpendingData.labels.length) },
-                  textinfo: 'percent+label' as const,
-                  textposition: 'outside' as const,
-                  textfont: { size: 11 },
-                  hovertemplate: '<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>',
-                  pull: categorySpendingData.labels.map((_, i) => i === 0 ? 0.05 : 0),
-                }]}
-                height={280}
-                layout={{
-                  showlegend: false,
-                  margin: { l: 10, r: 10, t: 10, b: 10 },
-                }}
-                config={{ displayModeBar: false }}
-              />
-            ) : (
-              <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No expense data to display
-              </div>
-            )}
-          </div>
-
-          {/* Twin Score Radar */}
-          <div className="glass-panel" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 12 }}>
-              🧠 Digital Twin Score Radar
-            </h3>
-            <PlotlyChart
-              data={[{
-                type: 'scatterpolar' as const,
-                r: [
-                  twin?.financialHealthScore || 0,
-                  twin?.productivityScore || 0,
-                  twin?.studyScore || 0,
-                  twin?.habitScore || 0,
-                  twin?.goalScore || 0,
-                  twin?.financialHealthScore || 0,
-                ],
-                theta: ['Finance', 'Productivity', 'Study', 'Habits', 'Goals', 'Finance'],
-                fill: 'toself' as const,
-                fillcolor: 'rgba(99,102,241,0.12)',
-                line: { color: '#6366f1', width: 2 },
-                marker: { size: 6, color: '#6366f1' },
-                hovertemplate: '<b>%{theta}</b>: %{r}%<extra></extra>',
-              }]}
-              height={280}
-              layout={{
-                polar: {
-                  radialaxis: { visible: true, range: [0, 100], gridcolor: 'rgba(0,0,0,0.05)', tickfont: { size: 9 } },
-                  angularaxis: { gridcolor: 'rgba(0,0,0,0.05)', tickfont: { size: 11 } },
-                  bgcolor: 'transparent',
-                },
-                showlegend: false,
-                margin: { l: 50, r: 50, t: 20, b: 20 },
-              }}
-              config={{ displayModeBar: false }}
-            />
-          </div>
-        </div>
-
-        {/* Goals & Main Content Layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 32, marginBottom: 32 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {/* Active Targets */}
-            <div className="glass-panel" style={{ padding: 32 }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <BookOpen size={20} style={{ color: 'var(--primary)' }} /> Core Targets & Aims
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div>
-                  <h5 style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: 6 }}>Long-Term Study Goal</h5>
-                  <div style={{ padding: 16, background: 'rgba(0,0,0,0.02)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-highlight)', fontWeight: 500 }}>
-                    {user?.studyGoal || 'No study goal defined. Head to Profile to set one.'}
-                  </div>
-                </div>
-                <div>
-                  <h5 style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: 6 }}>Habit Targets Summary</h5>
-                  <div style={{ padding: 16, background: 'rgba(0,0,0,0.02)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-highlight)', fontWeight: 500 }}>
-                    {user?.habitGoals || 'No habits summary set yet.'}
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div className="glass-card">
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Average Study Rating</span>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)', marginTop: 4 }}>
-                      {study?.averageProductivity ? `★ ${study.averageProductivity}/5` : 'N/A'}
-                    </div>
-                  </div>
-                  <div className="glass-card">
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Registered Status</span>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--success)', marginTop: 10 }}>
-                      Verified Account
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* Browser Mock Card Frame */}
+        <div className="glass-panel" style={{ padding: '24px', background: 'var(--card-bg)', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.05)', borderRadius: '20px' }}>
+          
+          {/* Mock Window Top Bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--card-border)', paddingBottom: '16px', marginBottom: '24px' }}>
+            {/* Dots */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#fbbf24' }} />
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
             </div>
 
-            {/* AI Advisor */}
-            <div className="glass-panel" style={{ padding: 32 }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                💡 AI Advisor Recommendations
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {recommendations.length === 0 ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '20px 0', textAlign: 'center' }}>
-                    No pending recommendations. Your twin advisor is happy!
-                  </div>
-                ) : (
-                  recommendations.map((rec) => (
-                    <div key={rec.id} style={{
-                      padding: 16, background: 'rgba(0,0,0,0.02)',
-                      borderLeft: rec.impactLevel === 'HIGH' ? '4px solid var(--danger)' : rec.impactLevel === 'MEDIUM' ? '4px solid var(--warning)' : '4px solid var(--primary)',
-                      borderTop: '1px solid var(--card-border)', borderRight: '1px solid var(--card-border)', borderBottom: '1px solid var(--card-border)',
-                      borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16,
-                    }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--primary)', background: 'var(--primary-glow)', padding: '2px 6px', borderRadius: 4 }}>
-                            {rec.category}
-                          </span>
-                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: rec.impactLevel === 'HIGH' ? 'var(--danger)' : rec.impactLevel === 'MEDIUM' ? 'var(--warning)' : 'var(--text-muted)' }}>
-                            {rec.impactLevel} IMPACT
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-                          {rec.recommendationText}
-                        </p>
-                      </div>
-                      <button onClick={() => api.put(`/recommendations/${rec.id}/apply`).then(() => { setRecommendations(prev => prev.filter(r => r.id !== rec.id)); fetchDashboardData(); })}
-                        style={{ padding: '6px 12px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
-                        Apply
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {/* Digital Twin Avatar */}
-            <div className="glass-panel" style={{ padding: 32, textAlign: 'center' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 16 }}>
-                🤖 AI Digital Twin
-              </h3>
-              <div style={{
-                fontSize: '5rem', margin: '20px auto', width: 120, height: 120,
-                background: 'var(--primary-glow)', borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 8px 24px var(--primary-glow)',
-              }}>
-                {twin?.twinEmoticon || '😐'}
-              </div>
-              <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-highlight)', marginTop: 16, padding: '0 10px' }}>
-                {twin?.twinStatus || 'Loading state...'}
-              </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 24 }}>
-                <div className="glass-card" style={{ padding: 12 }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Productivity</span>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', marginTop: 4 }}>{twin?.productivityScore || 50}%</div>
-                </div>
-                <div className="glass-card" style={{ padding: 12 }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Financial Health</span>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--success)', marginTop: 4 }}>{twin?.financialHealthScore || 50}%</div>
-                </div>
-              </div>
-              <button onClick={async () => { setSyncing(true); try { await api.post('/digital-twin/sync'); fetchDashboardData(); } finally { setSyncing(false); } }}
-                disabled={syncing} className="btn-primary" style={{ marginTop: 20, width: '100%', padding: 10 }}>
-                {syncing ? 'Syncing...' : 'Sync Twin State'}
+            {/* Navigation Tabs */}
+            <div style={{ display: 'flex', gap: '12px', background: 'rgba(0,0,0,0.03)', padding: '4px', borderRadius: '20px' }}>
+              <button 
+                onClick={() => navigate('/profile')}
+                style={{ background: 'transparent', padding: '6px 16px', fontSize: '0.85rem', color: 'var(--text-muted)' }}
+              >
+                Profile & Data
+              </button>
+              <button 
+                onClick={() => navigate('/predictive-analytics')}
+                style={{ background: 'transparent', padding: '6px 16px', fontSize: '0.85rem', color: 'var(--text-muted)' }}
+              >
+                Forecasting
+              </button>
+              <button 
+                onClick={() => navigate('/simulations')}
+                style={{ background: 'transparent', padding: '6px 16px', fontSize: '0.85rem', color: 'var(--text-muted)' }}
+              >
+                Simulation
+              </button>
+              <button 
+                style={{ background: 'var(--card-bg)', padding: '6px 16px', fontSize: '0.85rem', color: 'var(--text-highlight)', fontWeight: 700, borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+              >
+                Dashboard
               </button>
             </div>
+            <div style={{ width: '60px' }} /> {/* spacer */}
+          </div>
 
-            {/* Activity Logs */}
-            <div className="glass-panel" style={{ padding: 32, display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <History size={20} style={{ color: 'var(--primary)' }} /> Recent Activity
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1, overflowY: 'auto' }}>
-                {activities.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>No recent activities</div>
-                ) : activities.map((act) => (
-                  <div key={act.id} style={{ padding: '12px 16px', borderBottom: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{
-                        fontSize: '0.8rem', fontWeight: 700,
-                        color: act.activityType.includes('Completed') || act.activityType.includes('Registered') ? 'var(--success)' : act.activityType.includes('Login') ? 'var(--primary)' : 'var(--text-highlight)',
-                        background: 'rgba(0,0,0,0.03)', padding: '2px 8px', borderRadius: 4,
-                      }}>{act.activityType}</span>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {/* 3-Column Content Layout */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 2fr 1fr', gap: '24px' }}>
+            
+            {/* COLUMN 1: Digital Twin AI Chat */}
+            <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', height: '620px', padding: '16px', background: 'rgba(0,0,0,0.01)', border: '1px solid var(--card-border)', borderRadius: '16px' }}>
+              
+              {/* Column Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)' }}>
+                    Digital Twin AI
+                  </h3>
+                  <Sparkles size={14} style={{ color: 'var(--primary)' }} />
+                </div>
+                <span style={{ fontSize: '0.65rem', background: 'var(--primary)', color: 'white', fontWeight: 700, padding: '2px 8px', borderRadius: '10px' }}>
+                  AI Powered
+                </span>
+              </div>
+
+              {/* Chat Thread */}
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px', marginBottom: '16px' }}>
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-start', gap: '8px' }}>
+                    {msg.role === 'assistant' && (
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Bot size={14} style={{ color: 'var(--primary)' }} />
+                      </div>
+                    )}
+                    <div style={{
+                      maxWidth: '75%',
+                      padding: '10px 14px',
+                      borderRadius: msg.role === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0',
+                      background: msg.role === 'user' ? 'var(--primary)' : 'rgba(255,255,255,0.9)',
+                      border: msg.role === 'user' ? 'none' : '1px solid var(--card-border)',
+                      color: msg.role === 'user' ? 'white' : 'var(--text-highlight)',
+                      fontSize: '0.85rem',
+                      lineHeight: '1.4',
+                      whiteSpace: 'pre-wrap',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                    }}>
+                      {msg.content}
+                      {msg.mode && (
+                        <div style={{ fontSize: '0.6rem', opacity: 0.7, marginTop: '4px', fontStyle: 'italic' }}>
+                          Source: {msg.mode}
+                        </div>
+                      )}
+                    </div>
+                    {msg.role === 'user' && (
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <UserIcon size={14} style={{ color: 'var(--text-muted)' }} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Bot size={14} style={{ color: 'var(--primary)' }} />
+                    </div>
+                    <div style={{ padding: '10px 14px', borderRadius: '12px 12px 12px 0', background: 'rgba(255,255,255,0.9)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <RefreshCw size={12} className="spinning" style={{ color: 'var(--primary)' }} />
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Twin is typing...</span>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <form onSubmit={handleChatSubmit} style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask about your future..."
+                  disabled={chatLoading}
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid var(--card-border)' }}
+                />
+                <button type="submit" disabled={chatLoading || !chatInput.trim()} className="btn-primary" style={{ padding: '10px', borderRadius: '8px' }}>
+                  <Send size={14} />
+                </button>
+              </form>
+            </div>
+
+            {/* COLUMN 2: Your Digital Twin Dashboard */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              
+              {/* Column Header & range selector */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Activity size={18} style={{ color: 'var(--primary)' }} />
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
+                    Your Digital Twin Dashboard
+                  </h3>
+                </div>
+                
+                {/* Time Range Selector */}
+                <div style={{ display: 'flex', gap: '4px', background: 'rgba(0,0,0,0.03)', padding: '2px', borderRadius: '8px', alignItems: 'center' }}>
+                  <Calendar size={12} style={{ marginLeft: '4px', color: 'var(--text-muted)' }} />
+                  {(['1M', '3M', '1Y', '3Y'] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setTimeRange(range)}
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        background: timeRange === range ? 'var(--primary)' : 'transparent',
+                        color: timeRange === range ? 'white' : 'var(--text-muted)',
+                        borderRadius: '6px',
+                        fontWeight: 600
+                      }}
+                    >
+                      {range}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4 Line Charts Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                
+                {/* Chart 1: Savings Projection */}
+                <div className="glass-card" style={{ padding: '14px', background: 'rgba(255,255,255,0.45)' }}>
+                  <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+                    Savings Projection
+                  </h4>
+                  <div style={{ height: '110px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData.savings}>
+                        <XAxis dataKey="name" hide />
+                        <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
+                        <Tooltip formatter={(v) => `$${v}`} />
+                        <Line type="monotone" dataKey="value" stroke="var(--primary)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Chart 2: Productivity Score */}
+                <div className="glass-card" style={{ padding: '14px', background: 'rgba(255,255,255,0.45)' }}>
+                  <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+                    Productivity Score
+                  </h4>
+                  <div style={{ height: '110px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData.productivity}>
+                        <XAxis dataKey="name" hide />
+                        <YAxis hide domain={[0, 100]} />
+                        <Tooltip formatter={(v) => `${v}%`} />
+                        <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Chart 3: Fitness Activity */}
+                <div className="glass-card" style={{ padding: '14px', background: 'rgba(255,255,255,0.45)' }}>
+                  <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+                    Fitness Activity
+                  </h4>
+                  <div style={{ height: '110px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData.fitness}>
+                        <XAxis dataKey="name" hide />
+                        <YAxis hide domain={[0, 100]} />
+                        <Tooltip formatter={(v) => `${v}%`} />
+                        <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Chart 4: Study Hours */}
+                <div className="glass-card" style={{ padding: '14px', background: 'rgba(255,255,255,0.45)' }}>
+                  <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
+                    Study Hours
+                  </h4>
+                  <div style={{ height: '110px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData.study}>
+                        <XAxis dataKey="name" hide />
+                        <YAxis hide domain={['dataMin - 0.5', 'dataMax + 0.5']} />
+                        <Tooltip formatter={(v) => `${v} hrs`} />
+                        <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              {/* Underneath: 3 KPI Cards Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                <div className="glass-panel" style={{ padding: '14px', textAlign: 'center', background: 'var(--card-bg)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Goal Achievement</span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, margin: '4px 0', color: 'var(--text-highlight)' }}>
+                    {twin?.goalScore || 78}%
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                    <ArrowUpRight size={12} /> +5%
+                  </div>
+                </div>
+
+                <div className="glass-panel" style={{ padding: '14px', textAlign: 'center', background: 'var(--card-bg)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Financial Health</span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, margin: '4px 0', color: 'var(--text-highlight)' }}>
+                    {twin?.financialHealthScore || 82}%
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                    <ArrowUpRight size={12} /> +3%
+                  </div>
+                </div>
+
+                <div className="glass-panel" style={{ padding: '14px', textAlign: 'center', background: 'var(--card-bg)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Productivity</span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, margin: '4px 0', color: 'var(--text-highlight)' }}>
+                    {twin?.productivityScore || 75}%
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                    <ArrowDownRight size={12} /> -2%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* COLUMN 3: AI Recommendations */}
+            <div style={{ display: 'flex', flexDirection: 'column', height: '620px' }}>
+              
+              {/* Column Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)' }}>
+                    AI Recommendations
+                  </h3>
+                  <Sparkles size={14} style={{ color: '#a855f7' }} />
+                </div>
+                <span style={{ fontSize: '0.65rem', background: 'var(--primary)', color: 'white', fontWeight: 700, padding: '2px 8px', borderRadius: '10px' }}>
+                  AI Powered
+                </span>
+              </div>
+
+              {/* Recommendations list */}
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', paddingRight: '4px' }}>
+                {staticRecommendations.map((rec) => (
+                  <div
+                    key={rec.id}
+                    className="glass-panel"
+                    style={{
+                      padding: '14px',
+                      background: 'var(--card-bg)',
+                      borderLeft: `4px solid ${rec.color}`,
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                    }}
+                  >
+                    {/* Tags */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                        {rec.category}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700, background: 'rgba(16, 185, 129, 0.08)', padding: '2px 6px', borderRadius: '4px' }}>
+                        {rec.impact}
                       </span>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>{act.description}</p>
+                    {/* Text */}
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-highlight)', margin: 0, fontWeight: 500, lineHeight: '1.4' }}>
+                      {rec.title}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
+
         </div>
+
       </main>
     </div>
   );

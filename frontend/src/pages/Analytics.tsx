@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import PlotlyChart from '../components/PlotlyChart';
 import DateRangeFilter, { getDateRange } from '../components/DateRangeFilter';
-import { DollarSign, BookOpen, CheckSquare, Brain, TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react';
+import { DollarSign, BookOpen, CheckSquare, Brain, TrendingUp, Activity, Zap } from 'lucide-react';
 
 interface DashboardData {
   finance?: any;

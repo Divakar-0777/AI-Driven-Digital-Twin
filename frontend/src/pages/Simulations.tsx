@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { Zap, Plus, Trash2, Eye, AlertTriangle } from 'lucide-react';
+import { Zap, Plus, Trash2, Eye } from 'lucide-react';
 
 interface Simulation {
   id: string;
@@ -41,7 +41,7 @@ export const Simulations: React.FC = () => {
     e.preventDefault();
     try {
       setRunning(true);
-      const res = await api.post('/decision-simulations/run', {
+      await api.post('/decision-simulations/run', {
         decisionName: form.decisionName,
         category: form.category,
         action: form.action,
@@ -138,7 +138,6 @@ export const Simulations: React.FC = () => {
           {simulations.map(sim => {
             const decision = typeof sim.decision === 'string' ? JSON.parse(sim.decision) : sim.decision;
             const scenarios = typeof sim.scenarios === 'string' ? JSON.parse(sim.scenarios) : sim.scenarios;
-            const comparison = typeof sim.comparison === 'string' ? JSON.parse(sim.comparison) : sim.comparison;
             const recommendation = typeof sim.recommendation === 'string' ? JSON.parse(sim.recommendation) : sim.recommendation;
 
             return (

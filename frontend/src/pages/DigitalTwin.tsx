@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Brain, TrendingUp, TrendingDown, RefreshCw, Activity, DollarSign, BookOpen, CheckSquare, Target } from 'lucide-react';
+import { RefreshCw, Activity, DollarSign, BookOpen, CheckSquare, Target } from 'lucide-react';
 
 interface TwinState {
   productivityScore: number;

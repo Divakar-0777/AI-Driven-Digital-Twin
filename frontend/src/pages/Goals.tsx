@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { Target, Plus, Trash2, Edit2, Calendar, TrendingUp } from 'lucide-react';
+import { Target, Plus, Trash2, Edit2, Calendar } from 'lucide-react';
 
 interface Goal {
   id: string;

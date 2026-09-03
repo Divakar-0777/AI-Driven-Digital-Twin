@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { ArrowLeft, AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface SimulationData {
   id: string;
@@ -65,9 +65,7 @@ export const SimulationDetail: React.FC = () => {
 
   const decision = parseJSON(sim.decision);
   const scenarios = parseJSON(sim.scenarios);
-  const comparison = parseJSON(sim.comparison);
   const recommendation = parseJSON(sim.recommendation);
-  const outcomes = parseJSON(sim.outcomes);
   const assumptions = parseJSON(sim.assumptions);
 
   const scenarioList = Array.isArray(scenarios) ? scenarios : Object.values(scenarios);

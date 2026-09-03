@@ -108,3 +108,11 @@ export const DecisionSimulationInputSchema = z.object({
   selectedGoals: z.array(z.string()).optional().default([]),
   userPriorities: z.record(z.number()).default({}),
 });
+
+export const FitnessActivitySchema = z.object({
+  activityType: z.string().min(1, 'Activity type is required'),
+  duration: z.number().positive('Duration must be greater than 0 minutes'),
+  caloriesBurned: z.number().nonnegative('Calories burned must be a positive number'),
+  activityDate: z.string().datetime().or(z.string().date()).optional().default(() => new Date().toISOString()),
+});
+
