@@ -214,7 +214,7 @@ export const Dashboard: React.FC = () => {
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <Sidebar />
         <div style={{ flex: 1, marginLeft: 260, padding: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-panel" style={{ padding: 24, color: 'var(--text-highlight)' }}>Loading Digital Twin Assistant...</div>
+          <div className="glass-panel" style={{ padding: 24, color: 'var(--text-highlight)' }}>Loading Visual Risk & Compliance Assistant...</div>
         </div>
       </div>
     );
@@ -308,14 +308,14 @@ export const Dashboard: React.FC = () => {
           {/* 3-Column Content Layout */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 2fr 1fr', gap: '24px' }}>
             
-            {/* COLUMN 1: Digital Twin AI Chat */}
+            {/* COLUMN 1: Visual Risk & Compliance AI Chat */}
             <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', height: '620px', padding: '16px', background: 'rgba(0,0,0,0.01)', border: '1px solid var(--card-border)', borderRadius: '16px' }}>
               
               {/* Column Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)' }}>
-                    Digital Twin AI
+                    Visual Risk & Compliance AI
                   </h3>
                   <Sparkles size={14} style={{ color: 'var(--primary)' }} />
                 </div>
@@ -366,7 +366,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div style={{ padding: '10px 14px', borderRadius: '12px 12px 12px 0', background: 'rgba(255,255,255,0.9)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <RefreshCw size={12} className="spinning" style={{ color: 'var(--primary)' }} />
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Twin is typing...</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>AI Assistant is typing...</span>
                     </div>
                   </div>
                 )}
@@ -389,7 +389,7 @@ export const Dashboard: React.FC = () => {
               </form>
             </div>
 
-            {/* COLUMN 2: Your Digital Twin Dashboard */}
+            {/* COLUMN 2: Your Risk & Compliance Dashboard */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               
               {/* Column Header & range selector */}
@@ -397,7 +397,7 @@ export const Dashboard: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Activity size={18} style={{ color: 'var(--primary)' }} />
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
-                    Your Digital Twin Dashboard
+                    Visual Risk & Compliance Intelligence Dashboard
                   </h3>
                 </div>
                 

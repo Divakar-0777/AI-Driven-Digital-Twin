@@ -26,7 +26,7 @@ export const ChatAssistant: React.FC = () => {
         {
           id: 'welcome',
           sender: 'twin',
-          text: "Hi! I am your AI Digital Twin. I analyze your financial budgets, saving goals, study hours, and habit checks.\n\nAsk me anything! For example:\n- *'Can I afford a $800 laptop?'*\n- *'Show me my savings goals status.'*\n- *'Why did my financial health score decrease?'*",
+          text: "Hi! I am your AI Visual Risk and Compliance Intelligence Assistant. I analyze your financial health, risk budgets, goals, study habits, and compliance checks.\n\nAsk me anything! For example:\n- *'Can I afford a $800 laptop?'*\n- *'Show me my savings goals status.'*\n- *'Why did my financial health score decrease?'*",
           timestamp: new Date()
         }
       ]);
@@ -71,7 +71,7 @@ export const ChatAssistant: React.FC = () => {
       const errMsg: ChatMessage = {
         id: Math.random().toString(),
         sender: 'twin',
-        text: "Error communicating with Digital Twin. Please ensure the backend is running.",
+        text: "Error communicating with AI Intelligence System. Please ensure the backend is running.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errMsg]);
@@ -144,7 +144,7 @@ export const ChatAssistant: React.FC = () => {
                 <Brain size={16} color="white" />
               </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>Digital Twin Chat</h4>
+                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700, color: 'white' }}>Visual Risk & Compliance Chat</h4>
                 <span style={{ fontSize: '0.65rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
                   Advisor Active

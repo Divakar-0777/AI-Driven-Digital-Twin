@@ -297,7 +297,7 @@ export const PredictiveAnalytics: React.FC = () => {
               AI Predictive Analytics & Simulations
             </h1>
             <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginTop: '4px' }}>
-              Compare financial decisions, analyze unusual spending anomalies, and track digital twin health metrics.
+              Compare financial decisions, analyze unusual spending anomalies, and track visual risk and compliance health metrics.
             </p>
           </div>
 

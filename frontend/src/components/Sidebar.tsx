@@ -43,16 +43,16 @@ export const Sidebar: React.FC = () => {
           width: 36, height: 36, borderRadius: 10,
           background: 'linear-gradient(135deg, var(--primary) 0%, #a855f7 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 800, color: 'white', fontSize: '1.05rem',
+          fontWeight: 800, color: 'white', fontSize: '0.9rem',
           boxShadow: '0 4px 12px var(--primary-glow)',
         }}>
-          DT
+          VRC
         </div>
         <div>
-          <h1 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-highlight)', letterSpacing: '0.5px' }}>
-            Digital Twin AI
+          <h1 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-highlight)', letterSpacing: '0.2px', lineHeight: 1.2 }}>
+            Visual Risk & Compliance
           </h1>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Personal Life Simulator</span>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Intelligence System</span>
         </div>
       </div>
 

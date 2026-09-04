@@ -488,7 +488,7 @@ export const Finance: React.FC = () => {
                 margin: 0,
               }}
             >
-              AI Financial Digital Twin
+              AI Financial & Risk Intelligence
             </h2>
 
             <p

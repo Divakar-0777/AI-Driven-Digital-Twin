@@ -592,8 +592,8 @@ async function main() {
     data: [
       {
         userId: demoUser.id,
-        title: 'Welcome to Digital Twin AI',
-        message: 'Your personalized AI Digital Twin is now active! Start adding data to see your twin evolve.',
+        title: 'Welcome to AI Visual Risk & Compliance Intelligence System',
+        message: 'Your AI-Based Visual Risk and Compliance Intelligence System is now active! Start monitoring data to see intelligence updates.',
         type: 'INFO',
         isRead: true,
       },

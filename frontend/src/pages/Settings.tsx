@@ -131,8 +131,8 @@ export const Settings: React.FC = () => {
           <div className="glass-panel" style={{ padding: 28 }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 16 }}>About</h3>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
-              <p><strong>Digital Twin AI</strong> v1.0.0</p>
-              <p>An intelligent personal decision-support platform that builds a personalized digital representation of your life, finances, study habits, and goals.</p>
+              <p><strong>AI-Based Visual Risk and Compliance Intelligence System</strong> v1.0.0</p>
+              <p>An intelligent risk, compliance, decision-support and life simulation platform that builds personalized intelligence models across finances, activity patterns, habits, and compliance metrics.</p>
               <p style={{ marginTop: 8 }}>Powered by Machine Learning, Statistical Forecasting, and Conversational AI.</p>
             </div>
           </div>

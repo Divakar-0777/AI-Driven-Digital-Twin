@@ -10,8 +10,8 @@ from app.routes import finance, study, habits, analytics, chat, decision_simulat
 from app.routes import recommend
 
 app = FastAPI(
-    title="AI Personal Productivity & Finance Assistant - AI Microservice",
-    description="Python FastAPI service handling Machine Learning forecasts, regression models, time-series, and recommendation analytics.",
+    title="AI-Based Visual Risk and Compliance Intelligence System - AI Microservice",
+    description="Python FastAPI service handling Machine Learning risk forecasts, regression models, time-series, and compliance recommendation analytics.",
     version="1.0.0"
 )
 

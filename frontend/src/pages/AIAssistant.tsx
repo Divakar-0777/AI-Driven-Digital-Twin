@@ -155,8 +155,8 @@ export const AIAssistant: React.FC = () => {
                 <Bot size={20} style={{ color: 'var(--primary)' }} />
               </div>
               <div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)' }}>AI Digital Twin Assistant</h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ask me about your finances, study habits, goals, or any decisions</p>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-highlight)' }}>AI Visual Risk & Compliance Assistant</h3>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ask me about risk assessment, compliance metrics, finances, habits, or decisions</p>
               </div>
             </div>
           </div>

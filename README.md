@@ -1,6 +1,6 @@
-# 🧠 Digital Twin AI – Personal Life Simulation & Decision Assistant
+# 🛡️ AI-Based Visual Risk and Compliance Intelligence System
 
-An intelligent personal decision-support platform that builds a personalized digital representation of a user based on financial activity, study patterns, daily habits, goals, and lifestyle data. Powered by Machine Learning, Statistical Forecasting, and Conversational AI.
+An intelligent visual risk, compliance, decision-support, and life simulation platform that builds personalized models based on financial activity, study patterns, daily habits, goals, and risk/compliance metrics. Powered by Machine Learning, Statistical Forecasting, and Conversational AI.
 
 ---
 

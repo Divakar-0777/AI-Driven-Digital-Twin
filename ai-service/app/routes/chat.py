@@ -72,7 +72,7 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
     
     # Build context prompt
     context = f"""
-    You are Antigravity, the AI Personal Productivity and Financial Digital Twin assistant.
+    You are Antigravity, the AI Visual Risk and Compliance Intelligence System assistant.
     You are assisting a user. Here is the user's real, calculated backend data:
     - Monthly Income: ${payload.monthlyIncome:.2f}
     - General Monthly Expense Target: ${payload.monthlyExpenseTarget:.2f}
@@ -86,7 +86,7 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
     
     RULES:
     1. ONLY use the figures provided above. Do NOT hallucinate or calculate custom sums that differ from these facts.
-    2. Be direct, natural, and helpful. Focus on actionable trade-offs and digital twin concepts (how money affects studying/habits).
+    2. Be direct, natural, and helpful. Focus on actionable trade-offs, risk factors, and compliance metrics.
     """
 
     # Check for OpenAI API key
@@ -120,7 +120,7 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
     gemini_key = os.getenv("GEMINI_API_KEY")
     if gemini_key:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             body = {
                 "contents": [
@@ -134,9 +134,12 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
             if response.status_code == 200:
                 res_data = response.json()
                 text_reply = res_data['candidates'][0]['content']['parts'][0]['text']
-                return {"reply": text_reply, "mode": "Gemini (1.5 Flash)"}
+                return {"reply": text_reply, "mode": "Gemini (2.5 Flash)"}
+            else:
+                print(f"Gemini API error: Status {response.status_code}, {response.text}")
         except Exception as e:
             print("Gemini API call failed, falling back to rule-based parser:", e)
+
 
     # 2. Rule-Based Fallback Parser (Deterministic mode)
     reply = ""
@@ -192,7 +195,7 @@ def handle_chat(req: ChatRequest, user_id: str = Depends(verify_jwt_auth)):
     else:
         # Default fallback general response
         reply = (
-            "Hi there! I am your AI Digital Twin. I can assist with budgeting, goals, and productivity audits.\n\n"
+            "Hi there! I am your AI Visual Risk and Compliance Intelligence Assistant. I can assist with risk forecasting, compliance checks, budgeting, and productivity audits.\n\n"
             f"**Quick Stats Overview:**\n"
             f"- Monthly Income: ${payload.monthlyIncome:.2f}\n"
             f"- Logged Spending: ${total_expense:.2f} / Target: ${payload.monthlyExpenseTarget:.2f}\n"

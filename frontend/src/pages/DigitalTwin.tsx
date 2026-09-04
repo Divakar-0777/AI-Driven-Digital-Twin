@@ -84,10 +84,10 @@ export const DigitalTwin: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
           <div>
             <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
-              🧠 Digital Twin
+              🧠 Digital Twin & Risk Intelligence
             </h2>
             <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>
-              Your AI-powered digital representation and behaviour model
+              Your AI-powered digital representation and compliance behaviour model
             </p>
           </div>
           <button onClick={handleSync} disabled={syncing} className="btn-primary">
@@ -113,7 +113,7 @@ export const DigitalTwin: React.FC = () => {
             {twin?.twinEmoticon || '😐'}
           </div>
           <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-highlight)', marginBottom: 8 }}>
-            {user?.fullName}'s Digital Twin
+            {user?.fullName}'s Digital Twin & Risk Profile
           </h3>
           <p style={{ color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 16px' }}>
             {twin?.twinStatus || 'Initializing...'}
@@ -121,7 +121,7 @@ export const DigitalTwin: React.FC = () => {
           <div style={{ fontSize: '2.5rem', fontWeight: 800, color: getScoreColor(twin?.overallScore || 0) }}>
             {twin?.overallScore || 0}%
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Overall Twin Health Score</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Overall Risk & Intelligence Health Score</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: 8 }}>
             Last synced: {twin?.syncTimestamp ? new Date(twin.syncTimestamp).toLocaleString() : 'Never'}
           </p>
