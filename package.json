@@ -1,0 +1,12 @@
+{
+  "name": "ai-digital-twin-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:ai": "cd ai-service && .venv\\Scripts\\python -m uvicorn app.main:app --reload --port 8000",
+    "dev": "npx concurrently -n \"BACKEND,FRONTEND,AI\" -c \"blue.bold,green.bold,magenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ai\"",
+    "start": "npm run dev"
+  }
+}
