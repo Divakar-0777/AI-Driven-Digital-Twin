@@ -1,0 +1,12 @@
+subject,topic,duration,productivityRating,date,notes
+Machine Learning & AI,Neural Network Architectures & Backpropagation,90,5,2026-09-03T18:30:00Z,Implemented custom multi-layer perceptron in PyTorch with loss curves.
+Machine Learning & AI,Transformer Attention Mechanisms & LLM Fine-Tuning,120,5,2026-09-06T19:00:00Z,Studied Multi-Head Self-Attention and LoRA adapters.
+Cloud Computing & DevOps,AWS ECS Fargate & Container Orchestration,75,4,2026-09-04T17:15:00Z,Configured task definitions VPC endpoints and Application Load Balancer.
+Cloud Computing & DevOps,Terraform Infrastructure as Code (IaC) Pipelines,90,5,2026-09-07T16:00:00Z,Provisioned multi-region PostgreSQL RDS cluster and Redis cache.
+System Design & Architecture,Distributed Caching Strategies & Redis Invalidation,80,5,2026-09-05T20:00:00Z,Analyzed write-through vs cache-aside strategies and TTL expiration.
+System Design & Architecture,Event-Driven Microservices with Apache Kafka,105,5,2026-09-08T18:45:00Z,Designed pub/sub event schemas and consumer offset commit patterns.
+Data Structures & Algorithms,Dynamic Programming & Memoization Patterns,75,4,2026-09-06T15:30:00Z,Solved 3 medium/hard DP problems on LeetCode focusing on knapsack variations.
+Data Structures & Algorithms,Graph Traversal (Dijkstra Topological Sort & BFS/DFS),90,5,2026-09-09T19:30:00Z,Mastered shortest path algorithm implementations and DAG cycle detection.
+Full-Stack Web Development,React Server Components & Next.js App Router,90,5,2026-09-07T14:00:00Z,Built responsive dashboard with suspense streaming and server actions.
+Cybersecurity & Compliance,OAuth2.0 OpenID Connect & JWT Rotation,60,5,2026-09-10T17:30:00Z,Configured secure token refresh cycle with HTTP-only cookie storage.
+Cybersecurity & Compliance,API Rate Limiting OWASP Top 10 & Sanitization,45,4,2026-09-11T18:00:00Z,Implemented express-rate-limit and SQL injection defense middleware.

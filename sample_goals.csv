@@ -1,0 +1,10 @@
+goalName,description,goalType,targetValue,currentValue,unit,deadline,priority,status
+AWS Solutions Architect Certification,Study cloud patterns and pass the official AWS SAA-C03 certification exam,ACADEMIC,100,75,percent,2026-11-10T00:00:00Z,HIGH,ACTIVE
+Master Data Structures & Algorithms,Solve 150 LeetCode problems covering DP Trees Graphs and Heaps,ACADEMIC,150,92,problems,2026-12-10T00:00:00Z,MEDIUM,ACTIVE
+Build 6-Month Emergency Fund,Accumulate $15000 liquid safety buffer in high-yield savings account,FINANCIAL,15000,12500,dollars,2027-01-10T00:00:00Z,HIGH,ACTIVE
+Upgrade Engineering Workstation,Save for high-performance workstation for local AI model inference & compilation,FINANCIAL,2500,1800,dollars,2026-11-25T00:00:00Z,MEDIUM,ACTIVE
+Run 5K Under 25 Minutes,Build cardiovascular endurance with structured interval running 3x per week,FITNESS,25,27.2,minutes,2026-10-25T00:00:00Z,MEDIUM,ACTIVE
+Consistent Gym Strength Training,Complete 100 structured strength training sessions this calendar year,FITNESS,100,48,sessions,2027-03-10T00:00:00Z,MEDIUM,ACTIVE
+Launch SaaS Side Project MVP,Architect develop and deploy AI productivity tool to first 100 beta users,CAREER,100,60,percent,2026-12-20T00:00:00Z,HIGH,ACTIVE
+Read 24 Non-Fiction Books,Read 24 books on system architecture psychology finance and productivity,PERSONAL,24,14,books,2027-01-10T00:00:00Z,LOW,ACTIVE
+Maintain Daily 10-Minute Meditation Streak,Build mindfulness resilience and stress reduction with daily morning practice,LIFESTYLE,60,42,days,2026-10-11T00:00:00Z,MEDIUM,ACTIVE

@@ -1,0 +1,13 @@
+title,category,type,amount,date,paymentMethod,notes,recurring,recurrenceFrequency
+Monthly Salary,Salary,INCOME,4500.00,2026-09-01T09:00:00Z,Bank Transfer,Primary employment income,true,MONTHLY
+Freelance Client Project,Freelance,INCOME,850.00,2026-09-04T15:30:00Z,Bank Transfer,Web design milestone payout,false,
+Apartment Rent,Housing,EXPENSE,1200.00,2026-09-02T10:00:00Z,Bank Transfer,Monthly rental payment,true,MONTHLY
+Supermarket Groceries,Food & Dining,EXPENSE,145.50,2026-09-03T18:20:00Z,Credit Card,Weekly grocery haul,false,
+Electric & Water Utility,Utilities,EXPENSE,85.20,2026-09-05T11:00:00Z,Debit Card,Monthly power and water bill,true,MONTHLY
+High-Speed Fiber Internet,Utilities,EXPENSE,60.00,2026-09-06T14:15:00Z,Credit Card,Broadband subscription,true,MONTHLY
+Coffee & Snacks,Food & Dining,EXPENSE,18.75,2026-09-07T08:45:00Z,UPI,Morning cafe latte & pastry,false,
+Gym Membership,Health,EXPENSE,50.00,2026-09-08T07:30:00Z,Credit Card,Monthly fitness club access,true,MONTHLY
+Stock Dividend,Investments,INCOME,120.00,2026-09-09T12:00:00Z,Bank Transfer,Quarterly dividend payout,false,
+Dining Out with Friends,Food & Dining,EXPENSE,65.40,2026-09-10T20:30:00Z,Credit Card,Weekend restaurant dinner,false,
+Public Transit Pass,Transportation,EXPENSE,45.00,2026-09-11T09:00:00Z,Debit Card,Monthly metro card reload,true,MONTHLY
+Online Course Subscription,Education,EXPENSE,30.00,2026-09-11T16:00:00Z,Credit Card,AI & Machine learning tutorials,true,MONTHLY

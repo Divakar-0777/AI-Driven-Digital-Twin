@@ -1,0 +1,16 @@
+name,targetFrequency,completed,date
+Morning Exercise & Stretch,Daily,true,2026-09-11
+Read Technical Books (20 mins),Daily,true,2026-09-11
+Mindfulness & Meditation (10 mins),Daily,true,2026-09-11
+Drink 3 Liters Water,Daily,true,2026-09-11
+Deep Work / Coding Session (1 hr),Daily,true,2026-09-11
+Sleep by 11:00 PM,Daily,false,2026-09-11
+Morning Exercise & Stretch,Daily,false,2026-09-10
+Read Technical Books (20 mins),Daily,true,2026-09-10
+Mindfulness & Meditation (10 mins),Daily,true,2026-09-10
+Drink 3 Liters Water,Daily,true,2026-09-10
+Deep Work / Coding Session (1 hr),Daily,true,2026-09-10
+Sleep by 11:00 PM,Daily,true,2026-09-10
+Gym Strength Training (4x/Week),4x/Week,true,2026-09-11
+Weekly Financial Review & Budget Audit,Weekly,true,2026-09-10
+System Architecture Deep Dive,Weekly,false,2026-09-09
