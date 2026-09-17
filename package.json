@@ -7,6 +7,10 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:ai": "cd ai-service && .venv\\Scripts\\python -m uvicorn app.main:app --reload --port 8000",
     "dev": "npx concurrently -n \"BACKEND,FRONTEND,AI\" -c \"blue.bold,green.bold,magenta.bold\" \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:ai\"",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "build": "npm --prefix frontend run build",
+    "build:all": "npm --prefix frontend run build && npm --prefix backend run build",
     "start": "npm run dev"
   }
 }
